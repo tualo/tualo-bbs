@@ -2,6 +2,24 @@
 module.exports =
 class MessageBuffer extends Buffer
   position: 0
+  readDate: () ->
+    d = new Date
+    d.setSeconds @readByte() #0
+    d.setMinutes @readByte() # 1
+    d.setHours @readByte() # 2
+    d.setDate @readByte() # 3
+    @readByte() # 4
+    d.setMonth @readByte()-1 # 5
+    d.setFullYear @readShort() # 6
+    d
+  writeDate: (d) ->
+    @writeByte d.getSeconds()
+    @writeByte d.getMinutes()
+    @writeByte d.getHours()
+    @writeByte d.getDate()
+    @writeByte d.getDay()
+    @writeByte d.getMonth()+1
+    @writeShort d.getFullYear()
   readByte: () ->
     val = data.readInt @position
     @position++

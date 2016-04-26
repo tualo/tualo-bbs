@@ -72,48 +72,48 @@ class Message extends EventEmitter
 
       if message_type == Message.TYPE_ACK
         if message_interface==0
-          msg = new MSG2DC_ACK
+          msg = new MSG2DCACK
         else
-          msg = new MSG2CU_PREPARE_SIZE
+          msg = new MSG2CUPREPARESIZE
 
       if message_type == Message.TYPE_NAK
-        msg = new MSG2DC_NAK
+        msg = new MSG2DCNAK
 
       if message_type == Message.TYPE_OPEN_SERVICE
-        msg = new MSG2CU_OPEN_SERVICE
+        msg = new MSG2CUOPENSERVICE
 
       if message_type == Message.TYPE_CLOSE_SERVICE
-        msg = new MSG2CU_CLOSE_SERVICE
+        msg = new MSG2CUCLOSESERVICE
 
       if message_type == Message.TYPE_BBS_RETURN_STATUS_LIGHT
-        msg = new MSG2CU_RETURN_STATUS_LIGHT
+        msg = new MSG2CURETURNSTATUSLIGHT
 
       if message_type == Message.TYPE_BBS_GET_STATUS_LIGHT
-        msg = new MSG2CU_GET_STATUS_LIGHT
+        msg = new MSG2CUGETSTATUSLIGHT
 
       if message_type == Message.TYPE_BBS_START_PRINTJOB
-        msg = new MSG2CU_START_PRINTJOB
+        msg = new MSG2CUSTARTPRINTJOB
 
       if message_type == Message.TYPE_BBS_STOP_PRINT_JOB
-        msg = new MSG2CU_STOP_PRINTJOB
+        msg = new MSG2CUSTOPPRINTJOB
 
       if message_type == Message.TYPE_PREPARE_SIZE
-        msg = new MSG2CU_PREPARE_SIZE
+        msg = new MSG2CUPREPARESIZE
 
       if message_type == Message.TYPE_BBS_GET_STATUS
-        msg = new MSG2CU_GET_STATUS
+        msg = new MSG2CUGETSTATUS
 
       if message_type == Message.TYPE_BBS_GET_STATUS_RESPONSE
-        msg = new MSG2CU_GET_STATUS_RESPONSE
+        msg = new MSG2CUGETSTATUSRESPONSE
 
       if message_type == Message.TYPE_BBS_NEXT_IMPRINT
-        msg = new MSG2HS_NEXT_IMPRINT
+        msg = new MSG2HSNEXTIMPRINT
 
       if message_type == Message.TYPE_BBS_NEXT_IMPRINT
-        msg = new MSG2HS_NEXT_IMPRINT
+        msg = new MSG2HSNEXTIMPRINT
 
       if msg == null
-        msg = new MSG2DC_NAK()
+        msg = new MSG2DCNAK()
         console.error('unknown message type '+message_type.toString(16))
 
       msg.setMessageType message_type
