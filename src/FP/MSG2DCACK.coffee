@@ -1,6 +1,4 @@
-{Message} = require './Message'
-
-
+Message = require './Message'
 
 module.exports =
 class MSG2DCACK extends Message
@@ -13,3 +11,6 @@ class MSG2DCACK extends Message
   setApplictiondata: () ->
     @app_data = new MessageBuffer
     @app_data.writeShort @serviceID
+  readApplictiondata: (data) ->
+    data.position = 0
+    @serviceID = data.readShort()

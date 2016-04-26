@@ -1,9 +1,11 @@
-{Message} = require './Message'
+Message = require './Message'
 
 module.exports =
 class MSG2HSNEXTIMPRINT extends Message
 
   constructor: () ->
+    @type = 'MSG2HSNEXTIMPRINT'
+
     @job_id = 0
     @customer_id = 0
     @machine_no = 0
@@ -18,7 +20,7 @@ class MSG2HSNEXTIMPRINT extends Message
     @mail_weight = 0
 
     @setMessageInterface Message.INTERFACE_DI
-    @setMessageType Message.TYPE_BBS_STOP_PRINT_JOB
+    @setMessageType Message.SERVICE_NEXT_IMPRINT
 
   setJobId: (val) ->
     @job_id = val

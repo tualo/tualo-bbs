@@ -1,8 +1,9 @@
-{Message} = require './Message'
+Message = require './Message'
 
 module.exports =
 class MSG2CUOPENSERVICE extends Message
   constructor: () ->
+    @type = 'MSG2CUOPENSERVICE'
     @serviceID = 0
     @errorCode = 0
     @info = ""

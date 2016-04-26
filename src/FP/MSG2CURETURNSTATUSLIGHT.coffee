@@ -1,4 +1,4 @@
-{Message} = require './Message'
+Message = require './Message'
 
 module.exports =
 class MSG2CURETURNSTATUSLIGHT extends Message
