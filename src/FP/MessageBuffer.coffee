@@ -47,10 +47,12 @@ class MessageBuffer extends Buffer
     @position+=4
     val
   writeMultiByte: (txt,type) ->
-    val = data.writeMultiByte txt,type
+    if type=='iso-8859-1'
+      type = 'ascii'
+    val = data.write txt, @position, type
     @position+=txt.length
     val
   readMultiByte: (length,type) ->
-    val = data.readMultiByte txt,type
+    val = data.toString 'ascii', @position, @position+length
     @position+=length
-    length
+    val
