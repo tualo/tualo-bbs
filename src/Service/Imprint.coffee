@@ -1,18 +1,34 @@
 {EventEmitter} = require 'events'
-{Message} = require '../FP/Message'
-{MessageBuffer} = require '../FP/MessageBuffer'
-{MSG2HSNEXTIMPRINT} = require '../FP/MSG2HSNEXTIMPRINT'
-{MSG2DCACK} = require '../FP/MSG2DCACK'
-{Server} = require 'net'
+Message = require '../FP/Message'
+MessageBuffer = require '../FP/MessageBuffer'
+MSG2HSNEXTIMPRINT = require '../FP/MSG2HSNEXTIMPRINT'
+MSG2DCACK = require '../FP/MSG2DCACK'
+net = require 'net'
+os = require 'os'
 
 module.exports =
 class Imprint extends EventEmitter
   constructor: () ->
-    @timeout = 60000
+    @timeout = 3*60000
     @port = 4445
     @server = null
     @client = null
 
+  getIP: () ->
+    res = "127.0.0.1"
+    ifaces = os.networkInterfaces()
+    Object.keys(ifaces).forEach (ifname)->
+      alias = 0
+      ifaces[ifname].forEach (iface) ->
+        if ('IPv4' != iface.family or iface.internal != false)
+          return
+        if (alias >= 1)
+          console.log(ifname + ':' + alias, iface.address)
+        else
+          console.log(ifname, iface.address)
+        res=iface.address
+      alias+=1
+    res
   setPort: (val) ->
     @port = val
 
@@ -46,18 +62,18 @@ class Imprint extends EventEmitter
   onClientConnect: (client) ->
     if @client==null
       @client = client
-      @client.on 'data', (data) -> @onClientData(data)
-      @client.on 'end', (data) -> @onClientData(data)
-      @client.on 'error', (err) -> @onClientError(err)
-      @client.on 'close', () -> @onClientClose()
+      @client.on 'data', (data) => @onClientData(data)
+      @client.on 'end', (data) => @onClientData(data)
+      @client.on 'error', (err) => @onClientError(err)
+      @client.on 'close', () => @onClientClose()
     else
       console.error 'onClientConnect','there is a client allready'
 
   onClientData: (data) ->
 
-    console.log 'client data',data.toString(16)
+    console.log 'imprint client data',data.toString(16)
     message = Message.getMessageObject data
-    console.log 'message', message
+    console.log 'imprint message', message
 
     if message.type_of_message == Message.SERVICE_NEXT_IMPRINT
       @emit 'imprint', message

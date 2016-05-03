@@ -1,8 +1,8 @@
 {
   "name": "tualo-bbs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "bbs class collection",
-  "main": "index.js",
+  "main": "lib/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,6 +12,7 @@
     "grunt": "^1.0.1"
   },
   "dependencies": {
+    "colors": "^1.1.2",
     "tualo-commander": "0.0.6",
     "tualo-template": "0.0.2"
   }

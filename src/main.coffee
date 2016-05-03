@@ -20,9 +20,10 @@ global.error = (tag,msg) ->
 
 
 classNames = [
-  'Install'
+  'Controller',
+  'Imprint'
 ]
 
 exp = (name) ->
-  exports[name] = require './classes/'+name.toLowerCase()
+  exports[name] = require './Service/'+name
 ( exp(name) for name in classNames)

@@ -1,4 +1,6 @@
 Message = require './Message'
+MessageBuffer = require './MessageBuffer'
+
 
 module.exports =
 class MSG2CUOPENSERVICE extends Message
@@ -12,8 +14,7 @@ class MSG2CUOPENSERVICE extends Message
   setServiceID: (id) ->
     @serviceID = id
   readApplictiondata: (data) ->
-    data.position = 0
-    @serviceID = data.readShort()
+    @serviceID = data.readUInt16BE 0
   setApplictiondata: () ->
-    @app_data = new MessageBuffer
-    @app_data.writeShort @serviceID
+    @app_data = new Buffer 2
+    @app_data.writeUInt16BE @serviceID, 0

@@ -14,19 +14,18 @@ class MSG2CUPREPARESIZE extends Message
 
   readApplictiondata: (data) ->
     data.position = 0
-    @size = data.readShort()
+    @size = data.readUInt16BE()
 
   setApplictiondata: (data) ->
-    @app_data.position = 0
-    @app_data.writeShort @size
+    position = 0
+    @app_data = new Buffer 2
+    @app_data.writeUInt16BE @size,position
 
-#public override function toByteArray():ByteArray {
-#			setApplictiondata();
-#			var return_array:ByteArray = new ByteArray();
-#			bytes_of_application_data = app_data.length;
-#			return_array.writeShort(interface_of_message);
-#			return_array.writeShort(type_of_message);
-#			return_array.writeUnsignedInt(0x00010000);
-#			return_array.writeBytes(app_data);
-#			return return_array;
-#		}
+  getBuffer: () ->
+    @setApplictiondata()
+    buf = new Buffer 10
+    buf.writeUInt16BE @interface_of_message, 0
+    buf.writeUInt16BE @type_of_message, 2
+    buf.writeUInt32BE 0x00010000, 4
+    @app_data.copy buf, 8
+    buf

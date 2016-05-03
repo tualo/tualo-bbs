@@ -1,0 +1,54 @@
+{EventEmitter} = require 'events'
+Message = require '../FP/Message'
+MessageWrapper = require '../FP/MessageWrapper'
+
+MSG2DCACK = require '../FP/MSG2DCACK'
+MSG2CUOPENSERVICE = require '../FP/MSG2CUOPENSERVICE'
+MSG2CUCLOSESERVICE = require '../FP/MSG2CUCLOSESERVICE'
+MSG2CUPREPARESIZE = require '../FP/MSG2CUPREPARESIZE'
+
+module.exports =
+class Sequence extends EventEmitter
+  constructor: (socket) ->
+    @client = socket
+    @client.on 'data', (data) => @onData(data)
+    @message = null
+
+  run: () ->
+
+  end: () ->
+    @client.removeListener 'data', @onData
+    @emit 'end', @message
+
+  unexpected: (message) ->
+    console.log 'unexpected message', message
+    @client.removeListener 'data', @onData
+    @emit 'unexpected', message
+
+  onData: (data) ->
+    console.log data
+    message = MessageWrapper.getMessageObject data
+    if message==-1
+      return
+    @emit 'message', message
+
+  sendCloseService: () ->
+
+    message = new MSG2CUCLOSESERVICE
+
+    sendbuffer = message.toFullByteArray()
+    sizemessage = new MSG2CUPREPARESIZE
+    sizemessage.setSize sendbuffer.length
+    @client.write sizemessage.getBuffer()
+    @client.write sendbuffer
+
+  sendOpenService: (type) ->
+
+    message = new MSG2CUOPENSERVICE
+    message.setServiceID(type)
+    sendbuffer = message.toFullByteArray()
+
+    sizemessage = new MSG2CUPREPARESIZE
+    sizemessage.setSize sendbuffer.length
+    @client.write sizemessage.getBuffer()
+    @client.write sendbuffer

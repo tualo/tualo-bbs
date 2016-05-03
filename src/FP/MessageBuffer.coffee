@@ -1,58 +1,33 @@
 
-module.exports =
-class MessageBuffer extends Buffer
-  position: 0
-  readDate: () ->
-    d = new Date
-    d.setSeconds @readByte() #0
-    d.setMinutes @readByte() # 1
-    d.setHours @readByte() # 2
-    d.setDate @readByte() # 3
-    @readByte() # 4
-    d.setMonth @readByte()-1 # 5
-    d.setFullYear @readShort() # 6
-    d
-  writeDate: (d) ->
-    @writeByte d.getSeconds()
-    @writeByte d.getMinutes()
-    @writeByte d.getHours()
-    @writeByte d.getDate()
-    @writeByte d.getDay()
-    @writeByte d.getMonth()+1
-    @writeShort d.getFullYear()
-  readByte: () ->
-    val = data.readInt @position
-    @position++
-    val
-  writeByte: (num) ->
-    val = data.writeInt num, @position
-    @position++
-    val
+Buffer.prototype.position = 0
 
-  readShort: () ->
-    val = data.readUInt16BE @position
-    @position+=2
-    val
-  writeShort: (num) ->
-    val = data.writeUInt16BE num,@position
-    @position+=2
-    val
+Buffer.prototype.readDate = () ->
+  d = new Date
+  d.setSeconds @readInt8(0) #0
+  d.setMinutes @readInt8(1) # 1
+  d.setHours @readInt8(2) # 2
+  d.setDate @readInt8(3) # 3
+  #@readByte() # 4
+  d.setMonth @readInt8(5)-1 # 5
+  d.setFullYear @readUInt16(6) # 6
+  d
+  
+Buffer.prototype.writeDate = (d) ->
+  @writeInt8 d.getSeconds(),0
+  @writeInt8 d.getMinutes(),1
+  @writeInt8 d.getHours(),2
+  @writeInt8 d.getDate(),3
+  @writeInt8 d.getDay(),4
+  @writeInt8 d.getMonth()+1,5
+  @writeUInt16BE d.getFullYear(),6
 
-  readUInt: () ->
-    val = data.readUInt32BE @position
-    @position+=4
-    val
-  writeUInt: (num) ->
-    val = data.writeUInt32BE num, @position
-    @position+=4
-    val
-  writeMultiByte: (txt,type) ->
-    if type=='iso-8859-1'
-      type = 'ascii'
-    val = data.write txt, @position, type
-    @position+=txt.length
-    val
-  readMultiByte: (length,type) ->
-    val = data.toString 'ascii', @position, @position+length
-    @position+=length
-    val
+Buffer.prototype.writeMultiByte = (txt,type) ->
+  if type=='iso-8859-1'
+    type = 'ascii'
+  val = @write txt, @position, type
+  @position+=txt.length
+  val
+Buffer.prototype.readMultiByte = (length,type) ->
+  val = @toString 'ascii', @position, @position+length
+  @position+=length
+  val

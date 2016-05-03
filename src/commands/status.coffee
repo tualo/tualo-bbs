@@ -2,6 +2,7 @@
 path = require 'path'
 fs = require 'fs'
 Controller = require '../Service/Controller'
+Net = require 'net'
 
 module.exports =
 class Status extends Command
@@ -18,7 +19,18 @@ class Status extends Command
     """
 
   action: (options,args) ->
+
     if args.ip
-      ctrl = new Controller
-      ctrl.setIP args.ip
-      ctrl.open()
+      @ctrl = new Controller
+      @ctrl.setIP args.ip
+      @ctrl.on 'ready', ()=>@onReady()
+      @ctrl.open()
+
+  onReady: () ->
+
+    seq = @ctrl.getStatusLight()
+    seq.on 'end', (message) => @onSequenceEnd(message)
+    seq.run()
+
+  onSequenceEnd: (message) ->
+    console.log(message)

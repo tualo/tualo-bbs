@@ -25,8 +25,8 @@ class MSG2CURETURNSTATUSLIGHT extends Message
     @print_job_id = val
 
   readApplictiondata: (data) ->
-    data.position = 0
-    @setAvailableScale data.readByte()
-    @setSystemUID  data.readUInt()
-    @setPrintJobActive data.readByte()
-    @setPrintJobID data.readUInt()
+    position = -1
+    @setAvailableScale data.readUInt8 0
+    @setSystemUID  data.readUInt32BE 1
+    @setPrintJobActive data.readUInt8 5
+    @setPrintJobID data.readUInt32BE 6

@@ -48,19 +48,23 @@ class MSG2HSNEXTIMPRINT extends Message
     @mail_weight = val
 
   readApplictiondata: (data) ->
-    data.position = 0
-    @job_id = data.readUInt()
-    @customer_id = data.readUInt()
-    @machine_no = data.readUInt()
-    @high_imprint_no = data.readUInt()
-    @low_imprint_no = data.readUInt()
+    position = -4
+    @job_id = data.readUInt32BE position+=4
+    @customer_id = data.readUInt32BE position+=4
+    @machine_no = data.readUInt32BE position+=4
+    @high_imprint_no = data.readUInt32BE position+=4
+    @low_imprint_no = data.readUInt32BE position+=4
     @imprint_no = (@high_imprint_no >> 32) + @low_imprint_no
-    @creationDate = data.readDate()
-    @printedDate = data.readDate()
-    @endorsement_id = data.readInt()
-    @town_circle_id = data.readUInt()
-    @mail_length = data.readInt()
-    @mail_height = data.readInt()
-    @mail_thickness = data.readInt()
-    @mail_weight = data.readUInt()
+
+    @creationDate = data.slice(position,position+8).readDate()
+    position+=8
+    @printedDate = data.slice(position,position+8).readDate()
+    position+=8
+
+    @endorsement_id = data.readUInt32BE position+=4
+    @town_circle_id = data.readUInt32BE position+=4
+    @mail_length = data.readInt32BE position+=4
+    @mail_height = data.readInt32BE position+=4
+    @mail_thickness = data.readInt32BE position+=4
+    @mail_weight = data.readInt32BE position+=4
     @app_data = data

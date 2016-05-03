@@ -6,7 +6,7 @@ class MSG2CUGETSTATUSRESPONSE extends Message
   constructor: () ->
     @b_unkown = 1
     @statusID = 0x191b
-    @version = new Buffer
+    @version = new Buffer 0
     @setMessageInterface Message.INTERFACE_DO
     @setMessageType Message.TYPE_BBS_GET_STATUS_RESPONSE
 
@@ -14,15 +14,16 @@ class MSG2CUGETSTATUSRESPONSE extends Message
     @statusID = id
 
   readApplictiondata: (data) ->
-    data.position = 0
-    @b_unkown = data.readByte()
-    @serviceID = data.readShort()
-    @version_length = data.readUnsignedInt()
-    @version = data.slice data.position
+    position = -1
+    @b_unkown = data.readUInt8 position+=1
+    @serviceID = data.readUInt16BE position+=2
+    @version_length = data.readUInt32BE position+=4
+    @version = data.slice position
 
   setApplictiondata: () ->
-    @app_data = new MessageBuffer
-    @app_data.writeByte @b_unkown
-    @app_data.writeShort @statusID
-    @app_data.writeUnsignedInt version.length
-    @app_data.writeBytes version
+    @app_data = new Buffer 7 + version.length
+    position = -1
+    @app_data.writeUInt8 @b_unkown, position+=1
+    @app_data.writeUInt16BE @statusID, position+=2
+    @app_data.writeUInt32BE version.length, position+=4
+    version.copy @app_data, position
