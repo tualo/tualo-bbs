@@ -55,6 +55,7 @@ class StartPrintjob extends Sequence
     @sendOpenService Message.SERVICE_BBS_PRINTJOB
 
   onOpenService: (message) ->
+    console.log 'on onOpenService'
     if message.type_of_message == Message.TYPE_ACK and message.serviceID == Message.SERVICE_BBS_PRINTJOB
       @once 'message', (message) => @onStartPrintJob(message)
       @startPrintJob()
@@ -62,15 +63,20 @@ class StartPrintjob extends Sequence
       @unexpected message
 
   onCloseService: (message) ->
+    console.log 'on onCloseService'
     if message.type_of_message == Message.TYPE_ACK and message.serviceID == Message.SERVICE_BBS_PRINTJOB
       @end()
     else
       @unexpected message
 
   onStartPrintJob: (message) ->
+    console.log 'on onStartPrintJob'
     if message.type_of_message == Message.TYPE_BBS_START_PRINTJOB
       @message = message
       @once 'message', (message) => @onCloseService(message)
+      @sendCloseService()
+      console.log 'ok closing'
+    else if message.type_of_message == Message.TYPE_ACK
       @sendCloseService()
     else
       @unexpected message
