@@ -7,11 +7,11 @@ class MSG2CUSTARTPRINTJOB extends Message
 
   constructor: () ->
     @job_id = 1
-    @customer_id = 155
+    @customer_id = 1
     @print_date = 0
     @date_ahead = 0
     @weightmode = 3
-    @print_offset = 10
+    @print_offset = 50
     @imageid = 1
     @print_endorsement = 0
     @endorsement_id = 0
@@ -144,6 +144,8 @@ class MSG2CUSTARTPRINTJOB extends Message
 
     @app_data.write @imprint_channel_ip,position, "ascii"
     position+=@imprint_channel_ip.length
+    console.log 'ip data',@imprint_channel_port, @app_data.slice(position-@imprint_channel_ip.length,position).toString('ascii')
+
     @app_data.writeUInt32BE @imprint_channel_port, position
     position+=4
 

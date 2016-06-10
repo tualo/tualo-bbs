@@ -41,6 +41,7 @@ class Sequence extends EventEmitter
     sizemessage.setSize sendbuffer.length
     @client.write sizemessage.getBuffer()
     @client.write sendbuffer
+    @client.end()
 
   sendOpenService: (type) ->
 

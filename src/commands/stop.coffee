@@ -6,8 +6,8 @@ Controller = require '../Service/Controller'
 Net = require 'net'
 
 module.exports =
-class Print extends Command
-  @commandName: 'print'
+class Stop extends Command
+  @commandName: 'stop'
   @commandArgs: ['ip']
   @commandShortDescription: 'starts a print job on the machine'
   @options: [
@@ -34,12 +34,12 @@ class Print extends Command
     @ctrl.open()
 
   onReady: () ->
-    seq = @ctrl.getStartPrintjob()
-    seq.init()
+    seq = @ctrl.getStopPrintjob()
+    #seq.init()
     #seq.setJobId 1
-    seq.setImprintChannelPort @imprint.port
-    seq.setImprintChannelIP @imprint.getIP()
-
+    #console.log @imprint
+    #seq.setImprintChannelPort 4445
+    #seq.setImprintChannelIP @imprint.getIP()
     seq.on 'end', (message) => @onSequenceEnd(message)
     seq.run()
 

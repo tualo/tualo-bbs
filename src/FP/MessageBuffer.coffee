@@ -9,9 +9,9 @@ Buffer.prototype.readDate = () ->
   d.setDate @readInt8(3) # 3
   #@readByte() # 4
   d.setMonth @readInt8(5)-1 # 5
-  d.setFullYear @readUInt16(6) # 6
+  d.setFullYear @readUInt16BE(6) # 6
   d
-  
+
 Buffer.prototype.writeDate = (d) ->
   @writeInt8 d.getSeconds(),0
   @writeInt8 d.getMinutes(),1

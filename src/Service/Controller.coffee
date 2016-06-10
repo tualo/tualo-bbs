@@ -89,7 +89,7 @@ class Controller extends EventEmitter
 
   onEnd: () ->
     #@emit "end"
-    @client=null
+    #@client=null
 
   onClose: () ->
     @stopTimeoutTimer()
