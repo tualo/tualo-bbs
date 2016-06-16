@@ -11,7 +11,7 @@ module.exports =
 class Sequence extends EventEmitter
   constructor: (socket) ->
     @client = socket
-    @client.closeEventName = 'unexpected'
+    @client.closeEventName = 'expected'
     @client.on 'data', (data) => @onData(data)
     @message = null
 
