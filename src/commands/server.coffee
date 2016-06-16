@@ -35,7 +35,7 @@ class Server extends Command
 
       io.on 'connection', (socket) ->
 
-        imprint = new bbs.Imprint()
+        imprint = new bbs.Imprint args.machine_ip
         imprint.open()
 
         #imprint.on 'closed',()->

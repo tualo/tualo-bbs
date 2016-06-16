@@ -10,8 +10,9 @@ os = require 'os'
 
 module.exports =
 class Imprint extends EventEmitter
-  constructor: () ->
-    @timeout = 5*60000
+  constructor: (machine_ip) ->
+    @machine_ip = machine_ip
+    @timeout = 10*60000
     @port = 0
     @server = null
     @client = null
@@ -21,6 +22,7 @@ class Imprint extends EventEmitter
   getIP: () ->
     res = "127.0.0.1"
     ifaces = os.networkInterfaces()
+    m_ip = @machine_ip.split '.'
     Object.keys(ifaces).forEach (ifname)->
       alias = 0
       ifaces[ifname].forEach (iface) ->
@@ -30,7 +32,9 @@ class Imprint extends EventEmitter
           console.log(ifname + ':' + alias, iface.address)
         else
           console.log(ifname, iface.address)
-        res=iface.address
+        p = iface.address.split '.'
+        if m_ip[0]==p[0] and m_ip[1]==p[1] and m_ip[2]==p[2]
+          res=iface.address
       alias+=1
     res
 

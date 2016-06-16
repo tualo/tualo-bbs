@@ -22,7 +22,7 @@ class Print extends Command
   action: (options,args) ->
     @args=args
     if @args.ip
-      @imprint  = new Imprint
+      @imprint  = new Imprint @args.ip
       @imprint.on 'open', () => @onImprintOpen()
       @imprint.open()
 
