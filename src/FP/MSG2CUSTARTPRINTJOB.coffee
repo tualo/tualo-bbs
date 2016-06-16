@@ -8,17 +8,17 @@ class MSG2CUSTARTPRINTJOB extends Message
   constructor: () ->
     @job_id = 1
     @customer_id = 1
-    @print_date = 0
+    @print_date = 1
     @date_ahead = 0
-    @weightmode = 3
-    @print_offset = 50
+    @weightmode = 2
+    @print_offset = 78
     @imageid = 1
-    @print_endorsement = 0
+    @print_endorsement = 1
     @endorsement_id = 0
 
-    @endorsement_text = ""
+    @endorsement_text = "1223456"
 
-    @endorsement2_text = ""
+    @endorsement2_text = "Test"
     @advert = new Buffer 0
 
     @town_circle_id = 0
@@ -32,8 +32,12 @@ class MSG2CUSTARTPRINTJOB extends Message
     @setMessageInterface Message.INTERFACE_DI
     @setMessageType Message.TYPE_BBS_START_PRINTJOB
 
-    @advert = fs.readFileSync path.resolve(path.join( 'dat','empty.adv'))
-    console.log @advert.toString('hex')
+    try
+      @advert = fs.readFileSync path.resolve(path.join( 'dat','empty.adv'))
+      console.log 'advert',@advert.toString('base64')
+    catch e
+      console.log e
+
 
   setJobId: (val) ->
     @job_id = val
@@ -71,7 +75,65 @@ class MSG2CUSTARTPRINTJOB extends Message
     @imprint_channel_port = val
 
   readApplictiondata: (data) ->
-    data.position = 0
+    position = 0
+    if data.length < 30
+      return
+    @job_id = data.readUInt32BE position
+    position+=4
+    @customer_id = data.readUInt32BE position # fp customer id
+    position+=4
+    @print_date = data.readUInt8 position # 0 no date, 1 print date
+    position+=1
+    @date_ahead = data.readUInt16BE position
+    position+=2
+    @weightmode = data.readUInt8 position # 0 static, 1 first, 2 every, 3 none
+    position+=1
+    @print_offset = data.readUInt32BE position # offset in mm
+    position+=4
+    @imageid = data.readUInt32BE position
+    position+=4
+    @print_endorsement = data.readUInt8 position
+    position+=1
+    @endorsement_id = data.readUInt32BE position
+    position+=4
+    @endorsement_text_length = data.readUInt32BE position
+    console.log 'endorsement_text length',position
+    position+=4
+    @endorsement_text = data.slice(position,position+@endorsement_text_length).toString( "ascii")
+    console.log 'endorsement_text',@endorsement_text
+    position+=@endorsement_text_length
+    @endorsement2_text_length = data.readUInt32BE position
+    position+=4
+
+    @endorsement2_text = data.slice(position,position+@endorsement2_text_length).toString( "ascii" )
+    position+=@endorsement2_text_length
+
+    @advert_length = data.readUInt32BE position
+    position+=4
+    @advert = data.slice position, position+ @advert_length
+    position+=@advert_length
+
+    @town_circle_id = data.readUInt32BE  position
+    position+=4
+    @town_circle_length = data.readUInt32BE position
+    position+=4
+    @town_circle = data.slice(position,position + @town_circle_length).toString("ascii")
+
+    position+=@town_circle_length
+    @customer_number_length = data.readUInt32BE  position
+    position+=4
+    @customer_number = data.slice(position, position+@customer_number_length).toString("ascii")
+    position+=@customer_number_length
+
+    cutof = position
+    @imprint_channel_ip_length = data.readUInt32BE position
+    position+=4
+
+    @imprint_channel_ip = data.slice(position, position+@imprint_channel_ip_length).toString("ascii")
+    position+=@imprint_channel_ip_length
+    @imprint_channel_port = data.readUInt32BE position
+    position+=4
+
 
   setApplictiondata: (data) ->
     position = 0
@@ -91,7 +153,7 @@ class MSG2CUSTARTPRINTJOB extends Message
     position+=2
     @app_data.writeUInt8 @weightmode, position # 0 static, 1 first, 2 every, 3 none
     position+=1
-    console.log 'weightmode',position
+    console.log 'weightmode',position,' value ',@weightmode
     @app_data.writeUInt32BE @print_offset, position # offset in mm
     console.log 'print_offset',position
     position+=4

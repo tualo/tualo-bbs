@@ -11,6 +11,7 @@ module.exports =
 class Sequence extends EventEmitter
   constructor: (socket) ->
     @client = socket
+    @client.closeEventName = 'unexpected'
     @client.on 'data', (data) => @onData(data)
     @message = null
 
@@ -18,6 +19,7 @@ class Sequence extends EventEmitter
 
   end: () ->
     @client.removeListener 'data', @onData
+    @client.closeEventName = 'expected'
     @emit 'end', @message
 
   unexpected: (message) ->
@@ -26,7 +28,7 @@ class Sequence extends EventEmitter
     @emit 'unexpected', message
 
   onData: (data) ->
-    console.log data
+    console.log "< ", data
     message = MessageWrapper.getMessageObject data
     if message==-1
       return

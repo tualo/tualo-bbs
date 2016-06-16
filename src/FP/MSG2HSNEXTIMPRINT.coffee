@@ -20,7 +20,8 @@ class MSG2HSNEXTIMPRINT extends Message
     @mail_weight = 0
 
     @setMessageInterface Message.INTERFACE_DI
-    @setMessageType Message.SERVICE_NEXT_IMPRINT
+    @setMessageType Message.TYPE_BBS_NEXT_IMPRINT
+
 
   setJobId: (val) ->
     @job_id = val
@@ -48,6 +49,8 @@ class MSG2HSNEXTIMPRINT extends Message
     @mail_weight = val
 
   readApplictiondata: (data) ->
+    if data.length < 10
+      return
     position = -4
     @job_id = data.readUInt32BE position+=4
     @customer_id = data.readUInt32BE position+=4
@@ -67,4 +70,39 @@ class MSG2HSNEXTIMPRINT extends Message
     @mail_height = data.readInt32BE position+=4
     @mail_thickness = data.readInt32BE position+=4
     @mail_weight = data.readInt32BE position+=4
+    @app_data = data
+
+
+  setApplictiondata: () ->
+    data = new Buffer 60
+
+    position = 0
+    data.writeUInt32BE @job_id, position
+    position+=4
+    data.writeUInt32BE @customer_id, position
+    position+=4
+    data.writeUInt32BE @machine_no, position
+    position+=4
+    data.writeUInt32BE 0, position # @high_imprint_no
+    position+=4
+    data.writeUInt32BE @imprint_no, position # @low_imprint_no
+    position+=4
+
+    @creationDate = new Buffer(8)
+    position+=8
+    @printedDate = new Buffer(8)
+    position+=8
+
+    data.writeUInt32BE @endorsement_id, position
+    position+=4
+    data.writeUInt32BE @town_circle_id, position
+    position+=4
+    data.writeUInt32BE @mail_length, position
+    position+=4
+    data.writeUInt32BE @mail_height, position
+    position+=4
+    data.writeUInt32BE @mail_thickness, position
+    position+=4
+    data.writeUInt32BE @mail_weight, position
+    position+=4
     @app_data = data

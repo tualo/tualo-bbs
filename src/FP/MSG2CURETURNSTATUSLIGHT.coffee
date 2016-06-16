@@ -24,6 +24,19 @@ class MSG2CURETURNSTATUSLIGHT extends Message
   setPrintJobID: (val) ->
     @print_job_id = val
 
+  setApplictiondata: () ->
+    position = 0
+    @app_data = new Buffer 10
+
+    @app_data.writeUInt8 @available_scale, position
+    position+=1
+    @app_data.writeUInt32BE @system_uid, position
+    position+=4
+    @app_data.writeUInt8 @print_job_active, position
+    position+=1
+    @app_data.writeUInt32BE @print_job_id, position
+    position+=4
+
   readApplictiondata: (data) ->
     position = -1
     @setAvailableScale data.readUInt8 0

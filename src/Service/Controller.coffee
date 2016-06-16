@@ -31,7 +31,8 @@ class Controller extends EventEmitter
     @ping_timer = setTimeout @ping.bind(@), @ping_timeout
 
   ping: () ->
-    @getStatusLight()
+    if @client?
+      @getStatusLight()
 
   resetTimeoutTimer: () ->
     @resetPingTimer()
@@ -47,12 +48,17 @@ class Controller extends EventEmitter
     me = @
     if @client==null
       @client = Net.createConnection @port, @ip, () => @onConnect()
+      @closeEventName = 'unexpected_closed'
       @client.setTimeout 20000
       @client.on 'error', (err) ->
         me.emit 'err', err
         me.close()
       @client.on 'close', () ->
-        console.log 'cl'
+        console.log 'controller close',@closeEventName
+        me.emit 'closed',@closeEventName
+      @client.on 'end', () ->
+        console.log 'controller end'
+        me.emit 'ended'
 
   onConnect: () ->
 
@@ -93,7 +99,7 @@ class Controller extends EventEmitter
 
   onClose: () ->
     @stopTimeoutTimer()
-    @emit "closed"
+    @emit "closed",@client.closeEventName
     @client=null
 
 

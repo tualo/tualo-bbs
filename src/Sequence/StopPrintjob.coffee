@@ -26,7 +26,8 @@ class StopPrintjob extends Sequence
       @unexpected message
 
   onCloseService: (message) ->
-    if message.type_of_message == Message.TYPE_ACK and message.serviceID == Message.SERVICE_BBS_PRINTJOB
+    if message.type_of_message == Message.TYPE_ACK# and message.serviceID == Message.SERVICE_BBS_PRINTJOB
+      console.log "onCloseService StopPrintjob",message
       @end()
     else
       @unexpected message

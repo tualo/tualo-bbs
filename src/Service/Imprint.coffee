@@ -11,11 +11,13 @@ os = require 'os'
 module.exports =
 class Imprint extends EventEmitter
   constructor: () ->
-    @timeout = 3*60000
-    @port = 14445
+    @timeout = 5*60000
+    @port = 0
     @server = null
     @client = null
 
+  getPort: () ->
+    @address.port
   getIP: () ->
     res = "127.0.0.1"
     ifaces = os.networkInterfaces()
@@ -31,8 +33,9 @@ class Imprint extends EventEmitter
         res=iface.address
       alias+=1
     res
-  setPort: (val) ->
-    @port = val
+
+  #setPort: (val) ->
+  #  @port = val
 
   resetTimeoutTimer: () ->
     @stopTimeoutTimer()
@@ -53,56 +56,56 @@ class Imprint extends EventEmitter
       @server = net.createServer options, (client) => @onClientConnect(client)
       @server.on 'error', (err) => @onServerError(err)
       @server.on 'close', () => @onServerClose()
-      @server.listen @port,'192.168.192.243', () => @onServerBound()
+      @server.listen @port,@getIP(), () => @onServerBound()
 
   onServerError: (err) ->
     console.error err
 
   onServerBound: () ->
     @address = @server.address()
+
     console.log @address
     @resetTimeoutTimer()
     console.log 'imprint','server created'
     @emit "open"
 
   onClientConnect: (client) ->
-    console.log 'imprint','client connect'
-    if @client==null
-      @client = client
-      @client.on 'data', (data) => @onClientData(data)
-      @client.on 'end', (data) => @onClientData(data)
-      @client.on 'error', (err) => @onClientError(err)
-      @client.on 'close', () => @onClientClose()
-    else
-      console.error 'onClientConnect','there is a client allready'
+    #console.log 'imprint','client connect'
+    #if @client==null
+    @client = client
+    @client.on 'data', (data) => @onClientData(data)
+    @client.on 'end', (data) => @onClientData(data)
+    @client.on 'error', (err) => @onClientError(err)
+    @client.on 'close', () => @onClientClose()
+    #else
+    #  console.error 'onClientConnect','there is a client allready'
+
+  onClientEnd: (data) ->
+    console.log 'imprint client end'
+    @onClientData data
 
   onClientData: (data) ->
     if data
-      console.log 'imprint client data',data.toString('hex')
+      @resetTimeoutTimer()
+      console.log 'imprint client data < ',data.toString('hex')
       message = MessageWrapper.getMessageObject data
       console.log 'imprint message', message
-
-      if message.type_of_message == 4338
-        console.log '1'
+      if message.type_of_message ==  Message.TYPE_BBS_NEXT_IMPRINT
         @emit 'imprint', message
         ack = new MSG2DCACK
         ack.setApplictiondata()
-        @client.write ack.toFullByteArray()
-      else if message.type_of_message == 4098
-        ack = new MSG2DCACK
-        ack.setServiceID Message.SERVICE_NEXT_IMPRINT
-        ack.setApplictiondata()
         sendbuffer = ack.toFullByteArray()
         @client.write sendbuffer
+        console.log '>>>SEND ACK',sendbuffer
       else if message.type_of_message == Message.SERVICE_NEXT_IMPRINT
-        console.log '2'
+        console.log 'imprint','TYPE_OPEN_SERVICE'
         ack = new MSG2DCACK
         ack.setServiceID Message.SERVICE_NEXT_IMPRINT
         ack.setApplictiondata()
         @client.write ack.toFullByteArray()
 
       else if message.type_of_message == Message.TYPE_OPEN_SERVICE
-        console.log '3'
+        console.log 'imprint','TYPE_OPEN_SERVICE'
         ack = new MSG2DCACK
         ack.setServiceID Message.SERVICE_NEXT_IMPRINT
         ack.setApplictiondata()
@@ -112,6 +115,19 @@ class Imprint extends EventEmitter
         #sizemessage.setSize sendbuffer.length
         #@client.write sizemessage.getBuffer()
         @client.write sendbuffer
+        #@client.write ack.app_data
+
+      else if message.type_of_message == 4098
+        ack = new MSG2DCACK
+        ack.setServiceID Message.SERVICE_NEXT_IMPRINT
+        ack.setApplictiondata()
+
+        sendbuffer = ack.toFullByteArray()
+        #sizemessage = new MSG2CUPREPARESIZE
+        #sizemessage.setSize sendbuffer.length
+        #@client.write sizemessage.getBuffer()
+        @client.write sendbuffer
+        #@client.end()
         #@client.write ack.app_data
 
       else
@@ -124,8 +140,8 @@ class Imprint extends EventEmitter
     console.error 'client error', err
 
   close: () ->
-    if @client!=null
-      @client.close()
+    if @client?#!=null
+      @client.end()
 
     @server.close()
 

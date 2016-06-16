@@ -21,17 +21,20 @@ class StatusLight extends Sequence
     console.log message
     if message.type_of_message == Message.TYPE_ACK and message.serviceID == Message.SERVICE_STATUS_LIGHT
       @once 'message', (message) => @onGetStatusLight(message)
+      console.log('sendBBSStatusLight')
       @sendBBSStatusLight()
     else
       @unexpected message
 
   onCloseService: (message) ->
-    if message.type_of_message == Message.TYPE_ACK and message.serviceID == Message.SERVICE_STATUS_LIGHT
-      @end()
-    else
-      @unexpected message
+    console.log('onCloseService',message,Message.SERVICE_STATUS_LIGHT)
+    #if message.type_of_message == Message.TYPE_ACK# and message.serviceID == Message.SERVICE_STATUS_LIGHT
+    @end()
+    #else
+    #  @unexpected message
 
   onGetStatusLight: (message) ->
+    console.log('onGetStatusLight',message,Message.TYPE_BBS_RETURN_STATUS_LIGHT)
     if message.type_of_message == Message.TYPE_BBS_RETURN_STATUS_LIGHT
       @message = message
       @once 'message', (message) => @onCloseService(message)
