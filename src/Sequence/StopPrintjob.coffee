@@ -29,16 +29,16 @@ class StopPrintjob extends Sequence
     if message.type_of_message == Message.TYPE_ACK# and message.serviceID == Message.SERVICE_BBS_PRINTJOB
       console.log "onCloseService StopPrintjob",message
       @end()
-    else
-      @unexpected message
+    #else
+    #  @unexpected message
 
   onStopPrintJob: (message) ->
     if message.type_of_message == Message.TYPE_BBS_STOP_PRINTJOB
       @message = message
       @once 'message', (message) => @onCloseService(message)
       @sendCloseService()
-    else
-      @unexpected message
+    #else
+    #  @unexpected message
 
   stopPrintJob: () ->
 

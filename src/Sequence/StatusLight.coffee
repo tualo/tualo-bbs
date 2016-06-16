@@ -23,8 +23,8 @@ class StatusLight extends Sequence
       @once 'message', (message) => @onGetStatusLight(message)
       console.log('sendBBSStatusLight')
       @sendBBSStatusLight()
-    else
-      @unexpected message
+    #else
+    #  @unexpected message
 
   onCloseService: (message) ->
     console.log('onCloseService',message,Message.SERVICE_STATUS_LIGHT)
@@ -39,8 +39,8 @@ class StatusLight extends Sequence
       @message = message
       @once 'message', (message) => @onCloseService(message)
       @sendCloseService()
-    else
-      @unexpected message
+    #else
+    #  @unexpected message
 
   sendBBSStatusLight: () ->
     message = new MSG2CUGETSTATUSLIGHT

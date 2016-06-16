@@ -7,12 +7,13 @@ MSG2CUPREPARESIZE = require '../FP/MSG2CUPREPARESIZE'
 MSG2DCACK = require '../FP/MSG2DCACK'
 net = require 'net'
 os = require 'os'
+freeport = require 'freeport'
 
 module.exports =
 class Imprint extends EventEmitter
   constructor: (machine_ip) ->
     @machine_ip = machine_ip
-    @timeout = 10*60000
+    @timeout = 5*60000
     @port = 14445
     @server = null
     @client = null
@@ -52,15 +53,17 @@ class Imprint extends EventEmitter
 
   open: () ->
     if @server == null
-      options =
-        family: 'IPv4'
-        host: '0.0.0.0'
-        allowHalfOpen: true
-        pauseOnConnect: false
-      @server = net.createServer options, (client) => @onClientConnect(client)
-      @server.on 'error', (err) => @onServerError(err)
-      @server.on 'close', () => @onServerClose()
-      @server.listen @port,@getIP(), () => @onServerBound()
+      freeport (err,port) =>
+        @port = port
+        options =
+          family: 'IPv4'
+          host: '0.0.0.0'
+          allowHalfOpen: true
+          pauseOnConnect: false
+        @server = net.createServer options, (client) => @onClientConnect(client)
+        @server.on 'error', (err) => @onServerError(err)
+        @server.on 'close', () => @onServerClose()
+        @server.listen @port,@getIP(), () => @onServerBound()
 
   onServerError: (err) ->
     console.error err

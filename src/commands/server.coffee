@@ -32,12 +32,8 @@ class Server extends Command
     if args.port
 
       #imprint = new bbs.Imprint()
-      imprint=null
 
       io.on 'connection', (socket) ->
-        if imprint!=null
-          imprint.close()
-          
         imprint = new bbs.Imprint args.machine_ip
 
         imprint.open()
