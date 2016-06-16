@@ -13,7 +13,7 @@ class Imprint extends EventEmitter
   constructor: (machine_ip) ->
     @machine_ip = machine_ip
     @timeout = 10*60000
-    @port = 0
+    @port = 14445
     @server = null
     @client = null
 
