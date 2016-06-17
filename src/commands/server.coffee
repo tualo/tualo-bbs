@@ -11,9 +11,8 @@ module.exports =
 class Server extends Command
   @commandName: 'server'
   @commandArgs: ['port','machine_ip']
-  @commandShortDescription: 'port'
-  @options: [
-  ]
+  @commandShortDescription: 'running the bbs machine controll service'
+  @options: []
 
   @help: () ->
     """
