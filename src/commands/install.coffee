@@ -30,10 +30,14 @@ class Install extends Command
       Description=FP Machine Controll Service
       After=network.target
       [Service]
-      Type=forking
       Restart=always
-      ExecStart=/bin/sh -c "{cmd}"
+      ExecStart={cmd}
       User=root
+      StandardOutput=bbs
+      StandardError=bbs
+      SyslogIdentifier=bbs
+      Environment=NODE_ENV=production
+
       [Install]
       WantedBy=multi-user.target
       """
