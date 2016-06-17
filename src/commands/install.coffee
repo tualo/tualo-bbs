@@ -33,8 +33,8 @@ class Install extends Command
       Restart=always
       ExecStart={cmd}
       User=root
-      StandardOutput=bbs
-      StandardError=bbs
+      StandardOutput=syslog
+      StandardError=syslog
       SyslogIdentifier=bbs
       Environment=NODE_ENV=production
 
@@ -42,6 +42,12 @@ class Install extends Command
       WantedBy=multi-user.target
       """
       servicefiledata = servicefiledata.replace '{cmd}', path.resolve(__dirname,'..','..','bin','bbs-server') + ' 30001 '+args.machine_ip
+      console.log servicefiledata
       fs.writeFileSync '/etc/systemd/system/bbs.service', servicefiledata
-      ls = spawn('systemctl', ['daemon-reload'])
-      ls = spawn('systemctl', ['enable','bbs'])
+
+      console.log 'Now run:'
+      console.log 'systemctl daemon-reload'
+      console.log 'systemctl enable bbs'
+
+      #ls = spawn('systemctl', ['daemon-reload'])
+      #ls = spawn('systemctl', ['enable','bbs'])
