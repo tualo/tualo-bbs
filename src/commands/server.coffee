@@ -162,5 +162,5 @@ class Server extends Command
             seq.run()
           ctrl.open()
 
-      http.listen args.port,'0.0.0.0', () ->
+      http.listen args.port, () ->
         console.log('listening on *:'+ args.port)
