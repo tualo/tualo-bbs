@@ -13,7 +13,7 @@ module.exports =
 class Imprint extends EventEmitter
   constructor: (machine_ip) ->
     @machine_ip = machine_ip
-    @timeout = 5*60000
+    @timeout = 60*60*60000
     @port = 14445
     @server = null
     @client = null
