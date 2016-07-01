@@ -15,6 +15,7 @@
     "colors": "^1.1.2",
     "express": "^4.13.4",
     "freeport": "^1.0.5",
+    "mysql": "^2.11.1",
     "socket.io": "^1.4.6",
     "tualo-commander": "0.0.6",
     "tualo-template": "0.0.2"
