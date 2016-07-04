@@ -101,7 +101,7 @@ class Sampleserver extends Command
       @server = Net.createServer options, (client) => @onClientConnect(client)
       @server.on 'error', (err) => @onServerError(err)
       @server.on 'close', () => @onServerClose()
-      @server.listen args.port, () => @onServerBound()
+      @server.listen args.port,'127.0.0.1', () => @onServerBound()
 
   onServerError: (err) ->
     console.error err

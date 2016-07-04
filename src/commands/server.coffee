@@ -33,21 +33,26 @@ class Server extends Command
       #imprint = new bbs.Imprint()
       me = @
       me.waregroup = 'Standardsendungen'
+
       mysql      = require 'mysql'
-      opts =
-        host     : 'localhost'
-        user     : 'sorter'
-        password : 'sorter'
-        database : 'sorter'
-      connection = mysql.createConnection opts
-      connection.connect()
+      connection = null
+
+      fn = () ->
+        opts =
+          host     : 'localhost'
+          user     : 'sorter'
+          password : 'sorter'
+          database : 'sorter'
+        connection = mysql.createConnection opts
+        connection.connect()
+
+      setTimeout fn, 30000
 
       imprint = new bbs.Imprint args.machine_ip
       imprint.open()
 
 
       io.on 'connection', (socket) ->
-
         imprint.on 'imprint', (message) ->
           sql = '''
           insert into bbs_data
@@ -125,7 +130,9 @@ class Server extends Command
             fn = () ->
               ctrl.client.closeEventName='expected'
               socket.emit('stop',{})
+              console.log 'CLOSING (stop)!!!!'
               ctrl.close()
+
             setTimeout fn, 2000
             fs.exists '/opt/grab/customer.txt',(exists)->
               if exists
@@ -180,6 +187,7 @@ class Server extends Command
 
               seq.on 'end',() ->
                 socket.emit('start',{})
+                console.log 'CLOSING (stop)!!!!'
                 ctrl.close()
 
               seq.run()

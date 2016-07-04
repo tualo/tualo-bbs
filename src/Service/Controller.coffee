@@ -31,8 +31,8 @@ class Controller extends EventEmitter
     @ping_timer = setTimeout @ping.bind(@), @ping_timeout
 
   ping: () ->
-    if @client?
-      @getStatusLight()
+    #if @client?
+    #  @getStatusLight()
 
   resetTimeoutTimer: () ->
     @resetPingTimer()
