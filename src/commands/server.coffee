@@ -32,7 +32,7 @@ class Server extends Command
 
       #imprint = new bbs.Imprint()
       me = @
-
+      me.waregroup = 'Standardsendungen'
       mysql      = require 'mysql'
       opts =
         host     : 'localhost'
@@ -42,39 +42,61 @@ class Server extends Command
       connection = mysql.createConnection opts
       connection.connect()
 
+      imprint = new bbs.Imprint args.machine_ip
+      imprint.open()
+
 
       io.on 'connection', (socket) ->
-        imprint = new bbs.Imprint args.machine_ip
-        imprint.open()
+
         imprint.on 'imprint', (message) ->
-          #connection.connect()
           sql = '''
-          insert into  sv_daten (
-            mandant,
-            modell,
-            id,
-            datum,
-            zeit,
-            sortiergang,
-            sortierfach,
-            kunde
-          ) values
+          insert into bbs_data
           (
-            '0000',
-            'Clearing',
-            {code},
-            current_date(),
-            current_time(),
-            'NT',
-            'NT',
-            '{kunde}'
-          ) on duplicate key update
-            kunde = values(kunde)
+            id,
+            kundennummer,
+            kostenstelle,
+            height,
+            length,
+            thickness,
+            weight,
+            inserttime,
+            job_id,
+            machine_no,
+            login,
+            waregroup
+          ) values (
+            {id},
+            {kundennummer},
+            {kostenstelle},
+            {height},
+            {length},
+            {thickness},
+            {weight},
+            now(),
+            {job_id},
+            {machine_no},
+            '{login}',
+            '{waregroup}'
+          )
           '''
-          sql  = sql.replace('{kunde}',me.customerNumber)
-          sql  = sql.replace('{code}',''+(message.machine_no*100000000+message.imprint_no))
+          cp = me.customerNumber.split '|'
+          sql  = sql.replace('{id}',message.machine_no*100000000+message.imprint_no)
+
+          sql  = sql.replace('{kundennummer}', cp[0])
+          sql  = sql.replace('{kostenstelle}', cp[1])
+
+          sql  = sql.replace('{height}',message.mail_height)
+          sql  = sql.replace('{length}',message.mail_length)
+          sql  = sql.replace('{thickness}',message.mail_thickness)
+          sql  = sql.replace('{weight}',message.mail_weight)
+
+          sql  = sql.replace('{job_id}',message.job_id)
+          sql  = sql.replace('{machine_no}',message.machine_no)
+          sql  = sql.replace('{waregroup}',me.waregroup)
+          sql  = sql.replace('{login}','sorter')
+
           connection.query sql, (err, rows, fields) ->
-            null
+            console.log err
 
           socket.emit 'imprint', message
 
@@ -132,7 +154,8 @@ class Server extends Command
                   fs.writeFile '/opt/grab/customer.txt', message.customerNumber, (err) ->
                     if err
                       console.log err
-
+              if message.waregroup?
+                me.waregroup = message.waregroup
               seq.setPrintOffset(message.label_offset)
               seq.setDateAhead(message.date_offset)
               seq.setPrintEndorsement(message.print_endorsement)

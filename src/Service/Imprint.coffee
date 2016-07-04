@@ -44,12 +44,12 @@ class Imprint extends EventEmitter
 
   resetTimeoutTimer: () ->
     @stopTimeoutTimer()
-    @timeout_timer = setTimeout @close.bind(@), @timeout
+    #@timeout_timer = setTimeout @close.bind(@), @timeout
 
   stopTimeoutTimer: () ->
     if @timeout_timer
       clearTimeout @timeout_timer
-    @timeout_timer = setTimeout @close.bind(@), @timeout
+    #@timeout_timer = setTimeout @close.bind(@), @timeout
 
   open: () ->
     if @server == null
