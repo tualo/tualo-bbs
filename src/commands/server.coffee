@@ -22,7 +22,7 @@ class Server extends Command
 
   action: (options,args) ->
     if args.port
-
+      @args = args
       #imprint = new bbs.Imprint()
       me = @
       me.waregroup = 'Standardsendungen'
@@ -36,14 +36,17 @@ class Server extends Command
       @startMySQL()
 
   startMySQL: () ->
-    @connection.connect (err)=>onConnectError(err)
-    
+    @connection.connect (err) => @onConnectError
+    @startBBS()
+
   onConnectError: (err) ->
+    console.log 'err', err
     setTimeout startMySQL.bind(@),10
 
   startBBS: () ->
 
     connection = @connection
+    args = @args
     imprint = new bbs.Imprint args.machine_ip
     imprint.open()
 
