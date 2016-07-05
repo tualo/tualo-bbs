@@ -34,7 +34,6 @@ class MSG2CUSTARTPRINTJOB extends Message
 
     try
       @advert = fs.readFileSync path.resolve(path.join( 'dat','empty.adv'))
-      console.log 'advert',@advert.toString('base64')
     catch e
       console.log e
 
@@ -97,10 +96,8 @@ class MSG2CUSTARTPRINTJOB extends Message
     @endorsement_id = data.readUInt32BE position
     position+=4
     @endorsement_text_length = data.readUInt32BE position
-    console.log 'endorsement_text length',position
     position+=4
     @endorsement_text = data.slice(position,position+@endorsement_text_length).toString( "ascii")
-    console.log 'endorsement_text',@endorsement_text
     position+=@endorsement_text_length
     @endorsement2_text_length = data.readUInt32BE position
     position+=4
@@ -139,48 +136,34 @@ class MSG2CUSTARTPRINTJOB extends Message
     position = 0
     @app_data = new Buffer 8096
     @app_data.writeUInt32BE @job_id, position
-    console.log 'job_id',position
     position+=4
 
     @app_data.writeUInt32BE @customer_id, position # fp customer id
-    console.log 'customer_id',position
     position+=4
     @app_data.writeUInt8 @print_date, position # 0 no date, 1 print date
-    console.log 'print_date',position
     position+=1
     @app_data.writeUInt16BE @date_ahead, position
-    console.log 'date_ahead',position
     position+=2
     @app_data.writeUInt8 @weightmode, position # 0 static, 1 first, 2 every, 3 none
     position+=1
-    console.log 'weightmode',position,' value ',@weightmode
     @app_data.writeUInt32BE @print_offset, position # offset in mm
-    console.log 'print_offset',position
     position+=4
     @app_data.writeUInt32BE @imageid, position
-    console.log 'imageid',position
     position+=4
     @app_data.writeUInt8 @print_endorsement, position
-    console.log 'print_endorsement',position
     position+=1
     @app_data.writeUInt32BE @endorsement_id, position
-    console.log 'endorsement_id',position
     position+=4
     @app_data.writeUInt32BE @endorsement_text.length, position
-    console.log 'endorsement_text length',position
     position+=4
     @app_data.write @endorsement_text,position, "ascii"
-    console.log 'endorsement_text',position
     position+=@endorsement_text.length
-    console.log 'endorsement2_text',position
     @app_data.writeUInt32BE @endorsement2_text.length, position
-    console.log 'endorsement2_text',position
     position+=4
 
     @app_data.write @endorsement2_text,position, "ascii"
     position+=@endorsement2_text.length
 
-    console.log 'advert_size',position
     @app_data.writeUInt32BE @advert.length, position
     position+=4
     @advert.copy @app_data, position
@@ -193,12 +176,9 @@ class MSG2CUSTARTPRINTJOB extends Message
     @app_data.write @town_circle,position, "ascii"
     position+=@town_circle.length
     @app_data.writeUInt32BE @customer_number.length, position
-    console.log 'customer_number',position
     position+=4
     @app_data.write @customer_number,position, "ascii"
     position+=@customer_number.length
-
-    console.log 'imprint_channel_ip',position
 
     cutof = position
     @app_data.writeUInt32BE @imprint_channel_ip.length, position
@@ -206,7 +186,6 @@ class MSG2CUSTARTPRINTJOB extends Message
 
     @app_data.write @imprint_channel_ip,position, "ascii"
     position+=@imprint_channel_ip.length
-    console.log 'ip data',@imprint_channel_port, @app_data.slice(position-@imprint_channel_ip.length,position).toString('ascii')
 
     @app_data.writeUInt32BE @imprint_channel_port, position
     position+=4

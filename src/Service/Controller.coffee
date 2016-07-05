@@ -22,20 +22,7 @@ class Controller extends EventEmitter
   setIP: (val) ->
     @ip = val
 
-  resetPingTimer: () ->
-    @stopPingTimer()
-    @ping_timer = setTimeout @ping.bind(@), @ping_timeout
-  stopPingTimer: () ->
-    if @ping_timer
-      clearTimeout @ping_timer
-    @ping_timer = setTimeout @ping.bind(@), @ping_timeout
-
-  ping: () ->
-    #if @client?
-    #  @getStatusLight()
-
   resetTimeoutTimer: () ->
-    @resetPingTimer()
     @stopTimeoutTimer()
     @timeout_timer = setTimeout @close.bind(@), @timeout
 
@@ -54,7 +41,6 @@ class Controller extends EventEmitter
         me.emit 'err', err
         me.close()
       @client.on 'close', () ->
-        console.log 'controller close',@closeEventName
         me.emit 'closed',@closeEventName
       @client.on 'end', () ->
         console.log 'controller end'

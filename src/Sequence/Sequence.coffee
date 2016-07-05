@@ -23,12 +23,10 @@ class Sequence extends EventEmitter
     @emit 'end', @message
 
   unexpected: (message) ->
-    console.log 'unexpected message', message
     @client.removeListener 'data', @onData
     @emit 'unexpected', message
 
   onData: (data) ->
-    console.log "< ", data
     message = MessageWrapper.getMessageObject data
     if message==-1
       return
