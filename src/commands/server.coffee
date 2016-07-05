@@ -44,7 +44,7 @@ class Server extends Command
     setTimeout startMySQL.bind(@),10
 
   startBBS: () ->
-
+    me = @
     connection = @connection
     args = @args
     imprint = new bbs.Imprint args.machine_ip
