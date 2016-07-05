@@ -126,19 +126,19 @@ class Server extends Command
           socket.emit('closed',msg)
         ctrl.on 'ready', () ->
           seq = ctrl.getStopPrintjob()
-          seq.on 'end',() ->
-            ctrl.client.closeEventName='expected'
-            socket.emit('stop',{})
-            ctrl.close()
-          seq.run()
-
-          #fn = () ->
+          #seq.on 'end',() ->
           #  ctrl.client.closeEventName='expected'
           #  socket.emit('stop',{})
-          #  console.log 'CLOSING (stop)!!!!'
           #  ctrl.close()
-          #
-          #setTimeout fn, 2000
+          seq.run()
+
+          fn = () ->
+            ctrl.client.closeEventName='expected'
+            socket.emit('stop',{})
+            console.log 'CLOSING (stop)!!!!'
+            ctrl.close()
+          setTimeout fn, 2000
+
           fs.exists '/opt/grab/customer.txt',(exists)->
             if exists
               fs.writeFile '/opt/grab/customer.txt', '', (err) ->
