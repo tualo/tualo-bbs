@@ -42,6 +42,7 @@ class Controller extends EventEmitter
         me.close()
       @client.on 'close', () ->
         me.emit 'closed',@closeEventName
+        
       @client.on 'end', () ->
         console.log 'controller end'
         me.emit 'ended'

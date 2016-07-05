@@ -53,17 +53,17 @@ class Imprint extends EventEmitter
 
   open: () ->
     if @server == null
-      freeport (err,port) =>
-        @port = port
-        options =
-          family: 'IPv4'
-          host: '0.0.0.0'
-          allowHalfOpen: true
-          pauseOnConnect: false
-        @server = net.createServer options, (client) => @onClientConnect(client)
-        @server.on 'error', (err) => @onServerError(err)
-        @server.on 'close', () => @onServerClose()
-        @server.listen @port,@getIP(), () => @onServerBound()
+      #freeport (err,port) =>
+      #@port = port
+      options =
+        family: 'IPv4'
+        host: '0.0.0.0'
+        allowHalfOpen: true
+        pauseOnConnect: false
+      @server = net.createServer options, (client) => @onClientConnect(client)
+      @server.on 'error', (err) => @onServerError(err)
+      @server.on 'close', () => @onServerClose()
+      @server.listen @port,@getIP(), () => @onServerBound()
 
   onServerError: (err) ->
     console.error err
@@ -81,7 +81,7 @@ class Imprint extends EventEmitter
     #if @client==null
     @client = client
     @client.on 'data', (data) => @onClientData(data)
-    @client.on 'end', (data) => @onClientData(data)
+    @client.on 'end', (data) => @onClientEnd(data)
     @client.on 'error', (err) => @onClientError(err)
     @client.on 'close', () => @onClientClose()
     #else

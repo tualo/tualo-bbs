@@ -21,6 +21,7 @@ class Sequence extends EventEmitter
     @client.removeListener 'data', @onData
     @client.closeEventName = 'expected'
     @emit 'end', @message
+    @client.end()
 
   unexpected: (message) ->
     @client.removeListener 'data', @onData
