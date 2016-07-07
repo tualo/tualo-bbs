@@ -36,9 +36,13 @@ class Server extends Command
       @startMySQL()
 
   startMySQL: () ->
-    @connection.connect (err) => @onConnectError
-    @startBBS()
 
+    @connection.connect (err) => @onConnectError
+    connection.on 'error', (err) => @onDBError
+    @startBBS()
+  onDBError: (err) ->
+    console.log 'onDBError'
+    console.trace err
   onConnectError: (err) ->
     console.log 'err', err
     setTimeout startMySQL.bind(@),10
