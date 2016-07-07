@@ -111,33 +111,34 @@ class Server extends Command
         connection.query sql, (err, rows, fields) ->
           if err
             console.log err
-            ctrl = new bbs.Controller()
-            ctrl.setIP(args.machine_ip)
-            ctrl.on 'closed',(msg) ->
-              socket.emit('closed',msg)
-            ctrl.on 'ready', () ->
-              seq = ctrl.getStopPrintjob()
-              #seq.on 'end',() ->
-              #  ctrl.client.closeEventName='expected'
-              #  socket.emit('stop',{})
-              #  ctrl.close()
-              seq.run()
+            if err.errno!=1022
+              ctrl = new bbs.Controller()
+              ctrl.setIP(args.machine_ip)
+              ctrl.on 'closed',(msg) ->
+                socket.emit('closed',msg)
+              ctrl.on 'ready', () ->
+                seq = ctrl.getStopPrintjob()
+                #seq.on 'end',() ->
+                #  ctrl.client.closeEventName='expected'
+                #  socket.emit('stop',{})
+                #  ctrl.close()
+                seq.run()
 
-              fn = () ->
-                ctrl.client.closeEventName='expected'
-                socket.emit('stop',{})
-                console.log 'CLOSING (stop)!!!!'
-                ctrl.close()
-              setTimeout fn, 2000
+                fn = () ->
+                  ctrl.client.closeEventName='expected'
+                  socket.emit('stop',{})
+                  console.log 'CLOSING (stop)!!!!'
+                  ctrl.close()
+                setTimeout fn, 2000
 
-              fs.exists '/opt/grab/customer.txt',(exists)->
-                if exists
-                  fs.writeFile '/opt/grab/customer.txt', '', (err) ->
-                    if err
-                      console.log err
-              seq.run()
+                fs.exists '/opt/grab/customer.txt',(exists)->
+                  if exists
+                    fs.writeFile '/opt/grab/customer.txt', '', (err) ->
+                      if err
+                        console.log err
+                seq.run()
 
-            ctrl.open()
+              ctrl.open()
 
         socket.emit 'imprint', message
 
