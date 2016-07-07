@@ -32,7 +32,15 @@ class Server extends Command
         user     : 'sorter'
         password : 'sorter'
         database : 'sorter'
-      @connection = mysql.createConnection opts
+        connectionLimit: 100,
+        queueLimit: 10,
+        debug: true,
+        wait_timeout: 28800,
+        connect_timeout: 10
+      @connection = mysql.createPool opts
+
+
+
       @connection.on 'error', (err) => @onDBError
       @startMySQL()
 
