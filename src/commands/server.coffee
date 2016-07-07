@@ -33,14 +33,15 @@ class Server extends Command
         password : 'sorter'
         database : 'sorter'
       @connection = mysql.createConnection opts
+      @connection.on 'error', (err) => @onDBError
       @startMySQL()
 
   startMySQL: () ->
 
     @connection.connect (err) => @onConnectError
-    @connection.on 'error', (err) => @onDBError
     @startBBS()
   onDBError: (err) ->
+    console.log '####################'
     console.log 'onDBError'
     console.trace err
   onConnectError: (err) ->
