@@ -38,15 +38,11 @@ class Server extends Command
         wait_timeout: 28800,
         connect_timeout: 10
       @connection = mysql.createPool opts
-
-
-
       @connection.on 'error', (err) => @onDBError
       @startMySQL()
 
   startMySQL: () ->
-
-    @connection.connect (err) => @onConnectError
+    #@connection.connect (err) => @onConnectError
     @startBBS()
   onDBError: (err) ->
     console.log '####################'
