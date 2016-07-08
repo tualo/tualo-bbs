@@ -61,6 +61,9 @@ class Server extends Command
 
 
     io.on 'connection', (socket) ->
+      socket.on 'disconnect', () ->
+        imprint.removeAllListeners()
+        
       imprint.on 'imprint', (message) ->
         sql = '''
         insert into bbs_data
@@ -111,7 +114,7 @@ class Server extends Command
         connection.query sql, (err, rows, fields) ->
           if err
             console.log err
-            if err.errno!=1022
+            if err.code!='ER_DUP_KEY'
               ctrl = new bbs.Controller()
               ctrl.setIP(args.machine_ip)
               ctrl.on 'closed',(msg) ->
