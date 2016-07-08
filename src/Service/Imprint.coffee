@@ -116,7 +116,7 @@ class Imprint extends EventEmitter
         ack = new MSG2DCACK
         ack.setServiceID Message.SERVICE_NEXT_IMPRINT
         ack.setApplictiondata()
-
+        @emit 'acting'
         sendbuffer = ack.toFullByteArray()
         #sizemessage = new MSG2CUPREPARESIZE
         #sizemessage.setSize sendbuffer.length
@@ -134,6 +134,7 @@ class Imprint extends EventEmitter
         #sizemessage.setSize sendbuffer.length
         #@client.write sizemessage.getBuffer()
         @client.write sendbuffer
+        @emit 'acting'
         #@client.end()
         #@client.write ack.app_data
 
