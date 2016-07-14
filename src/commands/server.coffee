@@ -7,6 +7,8 @@ http = require('http').Server(app)
 io = require('socket.io')(http)
 bbs = require('../main')
 mysql      = require 'mysql'
+sss = require 'simple-stats-server'
+stats = sss()
 
 module.exports =
 class Server extends Command
@@ -32,29 +34,27 @@ class Server extends Command
         user     : 'sorter'
         password : 'sorter'
         database : 'sorter'
-        connectionLimit: 100,
-        queueLimit: 10,
-        debug: true,
-        wait_timeout: 28800,
-        connect_timeout: 10
+        connectionLimit: 100
+        wait_timeout: 28800
+        connect_timeout: 1000
+
+      # flush table bbs_data
+
       @connection = mysql.createPool opts
       @connection.on 'error', (err) => @onDBError
       @startMySQL()
-
   startMySQL: () ->
-    #@connection.connect (err) => @onConnectError
     @startBBS()
   onDBError: (err) ->
     console.log '####################'
     console.log 'onDBError'
     console.trace err
-  onConnectError: (err) ->
-    console.log 'err', err
-    setTimeout startMySQL.bind(@),10
+    process.exit()
+
 
   startBBS: () ->
     me = @
-    connection = @connection
+    pool = @connection
     args = @args
     imprint = new bbs.Imprint args.machine_ip
     imprint.open()
@@ -63,7 +63,11 @@ class Server extends Command
     io.on 'connection', (socket) ->
       socket.on 'disconnect', () ->
         imprint.removeAllListeners()
-        
+
+      imprint.on 'acting', () ->
+        # ok it's time to copy files
+
+
       imprint.on 'imprint', (message) ->
         sql = '''
         insert into bbs_data
@@ -111,37 +115,69 @@ class Server extends Command
         sql  = sql.replace('{waregroup}',me.waregroup)
         sql  = sql.replace('{login}','sorter')
 
-        connection.query sql, (err, rows, fields) ->
+        pool.getConnection(err, connection) ->
           if err
             console.log err
-            if err.code!='ER_DUP_KEY'
-              ctrl = new bbs.Controller()
-              ctrl.setIP(args.machine_ip)
-              ctrl.on 'closed',(msg) ->
-                socket.emit('closed',msg)
-              ctrl.on 'ready', () ->
-                seq = ctrl.getStopPrintjob()
-                #seq.on 'end',() ->
-                #  ctrl.client.closeEventName='expected'
-                #  socket.emit('stop',{})
-                #  ctrl.close()
-                seq.run()
+            ctrl = new bbs.Controller()
+            ctrl.setIP(args.machine_ip)
+            ctrl.on 'closed',(msg) ->
+              socket.emit('closed',msg)
+            ctrl.on 'ready', () ->
+              seq = ctrl.getStopPrintjob()
+              #seq.on 'end',() ->
+              #  ctrl.client.closeEventName='expected'
+              #  socket.emit('stop',{})
+              #  ctrl.close()
+              seq.run()
 
-                fn = () ->
-                  ctrl.client.closeEventName='expected'
-                  socket.emit('stop',{})
-                  console.log 'CLOSING (stop)!!!!'
-                  ctrl.close()
-                setTimeout fn, 2000
+              fn = () ->
+                ctrl.client.closeEventName='expected'
+                socket.emit('stop',{})
+                console.log 'CLOSING (stop)!!!!'
+                ctrl.close()
+              setTimeout fn, 2000
 
-                fs.exists '/opt/grab/customer.txt',(exists)->
-                  if exists
-                    fs.writeFile '/opt/grab/customer.txt', '', (err) ->
-                      if err
-                        console.log err
-                seq.run()
+              fs.exists '/opt/grab/customer.txt',(exists)->
+                if exists
+                  fs.writeFile '/opt/grab/customer.txt', '', (err) ->
+                    if err
+                      console.log err
+              seq.run()
 
-              ctrl.open()
+            ctrl.open()
+          else
+            connection.query sql, (err, rows, fields) ->
+              if err
+                console.log err
+                if err.code!='ER_DUP_KEY'
+                  ctrl = new bbs.Controller()
+                  ctrl.setIP(args.machine_ip)
+                  ctrl.on 'closed',(msg) ->
+                    socket.emit('closed',msg)
+                  ctrl.on 'ready', () ->
+                    seq = ctrl.getStopPrintjob()
+                    #seq.on 'end',() ->
+                    #  ctrl.client.closeEventName='expected'
+                    #  socket.emit('stop',{})
+                    #  ctrl.close()
+                    seq.run()
+
+                    fn = () ->
+                      ctrl.client.closeEventName='expected'
+                      socket.emit('stop',{})
+                      console.log 'CLOSING (stop)!!!!'
+                      ctrl.close()
+                    setTimeout fn, 2000
+
+                    fs.exists '/opt/grab/customer.txt',(exists)->
+                      if exists
+                        fs.writeFile '/opt/grab/customer.txt', '', (err) ->
+                          if err
+                            console.log err
+                    seq.run()
+
+                  ctrl.open()
+              connection.release()
 
         socket.emit 'imprint', message
 
@@ -187,6 +223,10 @@ class Server extends Command
           seq.run()
 
         ctrl.open()
+
+      socket.on 'serverStatus', (message) ->
+        stats.check 'memory', (obj) ->
+          socket.emit 'serverStatus', obj
 
       socket.on 'start', (message) ->
         _start = () ->

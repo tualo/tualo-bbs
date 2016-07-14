@@ -106,6 +106,7 @@ class Imprint extends EventEmitter
         console.log '>>>SEND ACK',sendbuffer
       else if message.type_of_message == Message.SERVICE_NEXT_IMPRINT
         console.log 'imprint','TYPE_OPEN_SERVICE'
+        @emit 'acting'
         ack = new MSG2DCACK
         ack.setServiceID Message.SERVICE_NEXT_IMPRINT
         ack.setApplictiondata()
@@ -113,10 +114,10 @@ class Imprint extends EventEmitter
 
       else if message.type_of_message == Message.TYPE_OPEN_SERVICE
         console.log 'imprint','TYPE_OPEN_SERVICE'
+        @emit 'acting'
         ack = new MSG2DCACK
         ack.setServiceID Message.SERVICE_NEXT_IMPRINT
         ack.setApplictiondata()
-        @emit 'acting'
         sendbuffer = ack.toFullByteArray()
         #sizemessage = new MSG2CUPREPARESIZE
         #sizemessage.setSize sendbuffer.length
@@ -125,6 +126,7 @@ class Imprint extends EventEmitter
         #@client.write ack.app_data
 
       else if message.type_of_message == 4098
+        @emit 'acting'
         ack = new MSG2DCACK
         ack.setServiceID Message.SERVICE_NEXT_IMPRINT
         ack.setApplictiondata()
@@ -134,7 +136,6 @@ class Imprint extends EventEmitter
         #sizemessage.setSize sendbuffer.length
         #@client.write sizemessage.getBuffer()
         @client.write sendbuffer
-        @emit 'acting'
         #@client.end()
         #@client.write ack.app_data
 
