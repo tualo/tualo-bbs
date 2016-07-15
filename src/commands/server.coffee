@@ -115,7 +115,7 @@ class Server extends Command
         sql  = sql.replace('{waregroup}',me.waregroup)
         sql  = sql.replace('{login}','sorter')
 
-        pool.getConnection(err, connection) ->
+        fn = (err, connection) ->
           if err
             console.log err
             ctrl = new bbs.Controller()
@@ -179,6 +179,8 @@ class Server extends Command
                   ctrl.open()
               connection.release()
 
+
+        pool.getConnection fn
         socket.emit 'imprint', message
 
       socket.on 'status', () ->
