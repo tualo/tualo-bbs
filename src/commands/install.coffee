@@ -6,7 +6,7 @@ spawn = require('child_process').spawn
 module.exports =
 class Install extends Command
   @commandName: 'install'
-  @commandArgs: ['machine_ip']
+  @commandArgs: ['machine_ip','hostsystem','hostdb']
   @commandShortDescription: 'install the systemd service'
   @options: [ ]
 
@@ -41,7 +41,8 @@ class Install extends Command
       [Install]
       WantedBy=multi-user.target
       """
-      servicefiledata = servicefiledata.replace '{cmd}', path.resolve(__dirname,'..','..','bin','bbs-server') + ' 30001 '+args.machine_ip
+      servicefiledata = servicefiledata.replace '{cmd}', path.resolve(__dirname,'..','..','bin','bbs-server') + ' 30001 '+args.machine_ip + ' '+args.hostsystem+ ' '+args.hostdb
+
       console.log servicefiledata
       fs.writeFileSync '/etc/systemd/system/bbs.service', servicefiledata
 
