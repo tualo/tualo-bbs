@@ -54,6 +54,7 @@ class Server extends Command
 
   startBBS: () ->
     me = @
+    me.customerNumber = '|'
     pool = @connection
     args = @args
     imprint = new bbs.Imprint args.machine_ip
@@ -98,8 +99,22 @@ class Server extends Command
           '{login}',
           '{waregroup}'
         )
+        on duplicate key update
+
+          kundennummer=values(kundennummer),
+          kostenstelle=values(kostenstelle),
+          height=values(height),
+          length=values(length),
+          thickness=values(thickness),
+          weight=values(weight),
+          inserttime=values(inserttime),
+          job_id=values(job_id),
+          machine_no=values(machine_no),
+          login=values(login),
+          waregroup=values(waregroup)
         '''
         cp = me.customerNumber.split '|'
+
         sql  = sql.replace('{id}',message.machine_no*100000000+message.imprint_no)
 
         sql  = sql.replace('{kundennummer}', cp[0])
