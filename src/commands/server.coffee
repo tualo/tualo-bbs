@@ -13,7 +13,7 @@ stats = sss()
 module.exports =
 class Server extends Command
   @commandName: 'server'
-  @commandArgs: ['port','machine_ip']
+  @commandArgs: ['port','machine_ip','hostsystem','hostdb']
   @commandShortDescription: 'running the bbs machine controll service'
   @options: []
 
@@ -30,10 +30,10 @@ class Server extends Command
       me.waregroup = 'Standardsendungen'
 
       opts =
-        host     : 'localhost'
+        host     : @args.hostsystem
         user     : 'sorter'
         password : 'sorter'
-        database : 'sorter'
+        database :  @args.hostdb
         connectionLimit: 100
         wait_timeout: 28800
         connect_timeout: 1000
