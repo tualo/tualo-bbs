@@ -49,7 +49,7 @@ class Server extends Command
     console.log '####################'
     console.log 'onDBError'
     console.trace err
-    process.exit()
+    setTimeout process.exit, 5000
 
 
   startBBS: () ->
