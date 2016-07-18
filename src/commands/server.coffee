@@ -36,7 +36,7 @@ class Server extends Command
         database :  @args.hostdb
         connectionLimit: 100
         wait_timeout: 28800
-        connect_timeout: 1000
+        connect_timeout: 10
 
       # flush table bbs_data
 
@@ -161,7 +161,12 @@ class Server extends Command
 
             ctrl.open()
           else
+            console.log 'write db'
             connection.query sql, (err, rows, fields) ->
+              console.log 'write db returned'
+              if err
+                console.log err.code
+                
               if err
                 console.log err
                 if err.code!='ER_DUP_KEY'
