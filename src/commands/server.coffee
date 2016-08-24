@@ -43,6 +43,28 @@ class Server extends Command
       @connection = mysql.createPool opts
       @connection.on 'error', (err) => @onDBError
       @startMySQL()
+
+      process.on('exit', @exitHandler.bind(@))
+      process.on('SIGINT', @exitHandler.bind(@))
+      process.on('uncaughtException', @exitHandler.bind(@))
+
+  exitHandler: () ->
+    args = @args
+    ctrl = new bbs.Controller()
+    ctrl.setIP(args.machine_ip)
+    ctrl.on 'closed',(msg) ->
+      socket.emit('closed',msg)
+    ctrl.on 'ready', () ->
+      seq = ctrl.getStopPrintjob()
+      fn = () ->
+        ctrl.client.closeEventName='expected'
+        socket.emit('stop',{})
+        ctrl.close()
+      setTimeout fn, 2000
+      seq.run()
+    ctrl.open()
+
+
   startMySQL: () ->
     @startBBS()
   onDBError: (err) ->
@@ -166,7 +188,7 @@ class Server extends Command
               console.log 'write db returned'
               if err
                 console.log err.code
-                
+
               if err
                 console.log err
                 if err.code!='ER_DUP_KEY'
