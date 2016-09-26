@@ -6,7 +6,7 @@ app = require('express')()
 http = require('http').Server(app)
 io = require('socket.io')(http)
 bbs = require('../main')
-mysql      = require 'mysql'
+mysql = require 'mysql'
 sss = require 'simple-stats-server'
 stats = sss()
 
@@ -44,25 +44,6 @@ class Server extends Command
       @connection.on 'error', (err) => @onDBError
       @startMySQL()
 
-      process.on('exit', @exitHandler.bind(@))
-      process.on('SIGINT', @exitHandler.bind(@))
-      process.on('uncaughtException', @exitHandler.bind(@))
-
-  exitHandler: () ->
-    args = @args
-    ctrl = new bbs.Controller()
-    ctrl.setIP(args.machine_ip)
-    ctrl.on 'closed',(msg) ->
-      socket.emit('closed',msg)
-    ctrl.on 'ready', () ->
-      seq = ctrl.getStopPrintjob()
-      fn = () ->
-        ctrl.client.closeEventName='expected'
-        socket.emit('stop',{})
-        ctrl.close()
-      setTimeout fn, 2000
-      seq.run()
-    ctrl.open()
 
 
   startMySQL: () ->
@@ -77,10 +58,13 @@ class Server extends Command
   startBBS: () ->
     me = @
     me.customerNumber = '|'
+    me.start_without_printing = false
+    me.job_id = 0
     pool = @connection
     args = @args
     imprint = new bbs.Imprint args.machine_ip
     imprint.open()
+
 
 
     io.on 'connection', (socket) ->
@@ -226,6 +210,17 @@ class Server extends Command
         socket.emit 'imprint', message
 
       socket.on 'status', () ->
+        if me.start_without_printing == true
+          message =
+            available_scale: 0
+            system_uid: 999
+            print_job_active: 1
+            print_job_id: me.job_id
+            interface_of_message: 9
+            type_of_message: 4340
+
+          socket.emit 'status',message
+          return
         ctrl = new bbs.Controller()
         ctrl.setIP(args.machine_ip)
         ctrl.on 'closed',(msg) ->
@@ -240,6 +235,11 @@ class Server extends Command
 
 
       socket.on 'stop', () ->
+        if me.start_without_printing == true
+          me.start_without_printing = false
+          socket.emit 'stop', {}
+          return
+
         ctrl = new bbs.Controller()
         ctrl.setIP(args.machine_ip)
         ctrl.on 'closed',(msg) ->
@@ -272,6 +272,19 @@ class Server extends Command
         stats.check 'memory', (obj) ->
           socket.emit 'serverStatus', obj
 
+      socket.on 'start_without_printing', (message) ->
+        me.start_without_printing = true
+        me.customerNumber = message.customerNumber
+        fs.exists '/opt/grab/customer.txt',(exists)->
+          if exists
+            fs.writeFile '/opt/grab/customer.txt', message.customerNumber, (err) ->
+              if err
+                console.log err
+        if message.waregroup?
+          me.waregroup = message.waregroup
+        me.job_id = message.job_id
+        socket.emit 'start_without_printing', {}
+
       socket.on 'start', (message) ->
         _start = () ->
           ctrl = new bbs.Controller()
@@ -281,6 +294,7 @@ class Server extends Command
           ctrl.on 'ready', () ->
             seq = ctrl.getStartPrintjob()
             seq.init()
+            me.job_id = message.job_id
             seq.setJobId(message.job_id)
             seq.setWeightMode(message.weight_mode)
             me.customerNumber = message.customerNumber

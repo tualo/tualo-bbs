@@ -51,7 +51,7 @@ class Sampleserver extends Command
         msg.setJobId @nextImprintMessage.job_id
         msg.setCustomerId 1
         msg.setMachineNo 210
-        msg.setImprintNo 1
+        msg.setImprintNo Math.round( ( (new Date()).getTime()-(new Date('2016-01-01')).getTime() )/1000 ) - 14200000
         #Math.round( ( (new Date()).getTime()-(new Date('2016-01-01')).getTime() )/1000 ) - 14200000
         msg.setEndorsementId 1
         msg.setTownCircleID 1
