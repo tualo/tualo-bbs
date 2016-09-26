@@ -60,6 +60,7 @@ class Server extends Command
     me.customerNumber = '|'
     me.start_without_printing = false
     me.job_id = 0
+    me.addressfield = 'L'
     pool = @connection
     args = @args
     imprint = new bbs.Imprint args.machine_ip
@@ -90,7 +91,8 @@ class Server extends Command
           job_id,
           machine_no,
           login,
-          waregroup
+          waregroup,
+          addressfield
         ) values (
           {id},
           {kundennummer},
@@ -103,7 +105,8 @@ class Server extends Command
           {job_id},
           {machine_no},
           '{login}',
-          '{waregroup}'
+          '{waregroup}',
+          '{addressfield}'
         )
         on duplicate key update
 
@@ -117,7 +120,8 @@ class Server extends Command
           job_id=values(job_id),
           machine_no=values(machine_no),
           login=values(login),
-          waregroup=values(waregroup)
+          waregroup=values(waregroup),
+          addressfield=values(addressfield)
         '''
         cp = me.customerNumber.split '|'
 
@@ -134,6 +138,8 @@ class Server extends Command
         sql  = sql.replace('{job_id}',message.job_id)
         sql  = sql.replace('{machine_no}',message.machine_no)
         sql  = sql.replace('{waregroup}',me.waregroup)
+        sql  = sql.replace('{addressfield}',me.addressfield)
+
         sql  = sql.replace('{login}','sorter')
 
         fn = (err, connection) ->
@@ -295,6 +301,8 @@ class Server extends Command
             seq = ctrl.getStartPrintjob()
             seq.init()
             me.job_id = message.job_id
+            if typeof message.addressfield=='string'
+              me.addressfield = message.addressfield
             seq.setJobId(message.job_id)
             seq.setWeightMode(message.weight_mode)
             me.customerNumber = message.customerNumber
