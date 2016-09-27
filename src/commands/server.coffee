@@ -215,6 +215,18 @@ class Server extends Command
         pool.getConnection fn
         socket.emit 'imprint', message
 
+
+
+      socket.on 'service', (message) ->
+        if message.type=='status'
+          if message.name=='grab'
+            me.checkGrabService socket, message
+          if message.name=='ocrsd'
+            me.checkOCRService socket, message
+        if message.type=='stop'
+          if message.name=='ocrsd' or message.name=='grab'
+            me.statusService socket, message
+
       socket.on 'status', () ->
         if me.start_without_printing == true
           message =
@@ -316,6 +328,7 @@ class Server extends Command
               me.waregroup = message.waregroup
             seq.setPrintOffset(message.label_offset)
             seq.setDateAhead(message.date_offset)
+            seq.setPrintDate(message.print_date)
             seq.setPrintEndorsement(message.print_endorsement)
             endorsement1 = ''
             if message.endorsement1
@@ -380,3 +393,38 @@ class Server extends Command
 
     http.listen args.port,'0.0.0.0', () ->
       console.log('listening on *:'+ args.port)
+
+
+
+  startStopService: (socket,cmd)->
+    spawn = require('child_process').spawn
+    proc = spawn('serice', [cmd.name, cmd.type])
+    proc.on 'close', (code) ->
+      val =
+        service: cmd.name
+      socket.emit cmd.type, val
+
+  statusService: (socket,cmd)->
+    spawn = require('child_process').spawn
+    ls = spawn('service', [cmd.name, 'status'])
+
+    ls.stdout.on 'data', (data) ->
+      if data.toString().indexOf('(running)')>=0
+        val =
+          state: 'running'
+          service: cmd.name
+          type: 'status'
+        socket.emit 'service', val
+      if data.toString().indexOf('inactive')>=0
+        val =
+          state: 'inactive'
+          service: cmd.name
+          type: 'status'
+        socket.emit 'service', val
+
+    ls.stderr.on 'data', (data) ->
+      val =
+        state: 'error'
+        service: cmd.name
+        type: 'status'
+      socket.emit 'service', val
