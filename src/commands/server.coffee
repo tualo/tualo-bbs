@@ -63,157 +63,162 @@ class Server extends Command
     me.addressfield = 'L'
     pool = @connection
     args = @args
-    imprint = new bbs.Imprint args.machine_ip
-    imprint.open()
+
+    imprint=null
+    if args.machine_ip!='0'
+      imprint = new bbs.Imprint args.machine_ip
+      imprint.open()
 
 
 
     io.on 'connection', (socket) ->
       socket.on 'disconnect', () ->
-        imprint.removeAllListeners()
+        if imprint!=null
+          imprint.removeAllListeners()
 
-      imprint.on 'acting', () ->
-        # ok it's time to copy files
-
-
-      imprint.on 'imprint', (message) ->
-        sql = '''
-        insert into bbs_data
-        (
-          id,
-          kundennummer,
-          kostenstelle,
-          height,
-          length,
-          thickness,
-          weight,
-          inserttime,
-          job_id,
-          machine_no,
-          login,
-          waregroup,
-          addressfield
-        ) values (
-          {id},
-          {kundennummer},
-          {kostenstelle},
-          {height},
-          {length},
-          {thickness},
-          {weight},
-          now(),
-          {job_id},
-          {machine_no},
-          '{login}',
-          '{waregroup}',
-          '{addressfield}'
-        )
-        on duplicate key update
-
-          kundennummer=values(kundennummer),
-          kostenstelle=values(kostenstelle),
-          height=values(height),
-          length=values(length),
-          thickness=values(thickness),
-          weight=values(weight),
-          inserttime=values(inserttime),
-          job_id=values(job_id),
-          machine_no=values(machine_no),
-          login=values(login),
-          waregroup=values(waregroup),
-          addressfield=values(addressfield)
-        '''
-        cp = me.customerNumber.split '|'
-
-        sql  = sql.replace('{id}',message.machine_no*100000000+message.imprint_no)
-
-        sql  = sql.replace('{kundennummer}', cp[0])
-        sql  = sql.replace('{kostenstelle}', cp[1])
-
-        sql  = sql.replace('{height}',message.mail_height)
-        sql  = sql.replace('{length}',message.mail_length)
-        sql  = sql.replace('{thickness}',message.mail_thickness)
-        sql  = sql.replace('{weight}',message.mail_weight)
-
-        sql  = sql.replace('{job_id}',message.job_id)
-        sql  = sql.replace('{machine_no}',message.machine_no)
-        sql  = sql.replace('{waregroup}',me.waregroup)
-        sql  = sql.replace('{addressfield}',me.addressfield)
-
-        sql  = sql.replace('{login}','sorter')
-
-        fn = (err, connection) ->
-          if err
-            console.log err
-            ctrl = new bbs.Controller()
-            ctrl.setIP(args.machine_ip)
-            ctrl.on 'closed',(msg) ->
-              socket.emit('closed',msg)
-            ctrl.on 'ready', () ->
-              seq = ctrl.getStopPrintjob()
-              #seq.on 'end',() ->
-              #  ctrl.client.closeEventName='expected'
-              #  socket.emit('stop',{})
-              #  ctrl.close()
-              seq.run()
-
-              fn = () ->
-                ctrl.client.closeEventName='expected'
-                socket.emit('stop',{})
-                console.log 'CLOSING (stop)!!!!'
-                ctrl.close()
-              setTimeout fn, 2000
-
-              fs.exists '/opt/grab/customer.txt',(exists)->
-                if exists
-                  fs.writeFile '/opt/grab/customer.txt', '', (err) ->
-                    if err
-                      console.log err
-              seq.run()
-
-            ctrl.open()
-          else
-            console.log 'write db'
-            connection.query sql, (err, rows, fields) ->
-              console.log 'write db returned'
-              if err
-                console.log err.code
-
-              if err
-                console.log err
-                if err.code!='ER_DUP_KEY'
-                  ctrl = new bbs.Controller()
-                  ctrl.setIP(args.machine_ip)
-                  ctrl.on 'closed',(msg) ->
-                    socket.emit('closed',msg)
-                  ctrl.on 'ready', () ->
-                    seq = ctrl.getStopPrintjob()
-                    #seq.on 'end',() ->
-                    #  ctrl.client.closeEventName='expected'
-                    #  socket.emit('stop',{})
-                    #  ctrl.close()
-                    seq.run()
-
-                    fn = () ->
-                      ctrl.client.closeEventName='expected'
-                      socket.emit('stop',{})
-                      console.log 'CLOSING (stop)!!!!'
-                      ctrl.close()
-                    setTimeout fn, 2000
-
-                    fs.exists '/opt/grab/customer.txt',(exists)->
-                      if exists
-                        fs.writeFile '/opt/grab/customer.txt', '', (err) ->
-                          if err
-                            console.log err
-                    seq.run()
-
-                  ctrl.open()
-              connection.release()
+      if imprint!=null
+        imprint.on 'acting', () ->
+          # ok it's time to copy files
 
 
-        pool.getConnection fn
-        socket.emit 'imprint', message
+        imprint.on 'imprint', (message) ->
+          sql = '''
+          insert into bbs_data
+          (
+            id,
+            kundennummer,
+            kostenstelle,
+            height,
+            length,
+            thickness,
+            weight,
+            inserttime,
+            job_id,
+            machine_no,
+            login,
+            waregroup,
+            addressfield
+          ) values (
+            {id},
+            {kundennummer},
+            {kostenstelle},
+            {height},
+            {length},
+            {thickness},
+            {weight},
+            now(),
+            {job_id},
+            {machine_no},
+            '{login}',
+            '{waregroup}',
+            '{addressfield}'
+          )
+          on duplicate key update
+
+            kundennummer=values(kundennummer),
+            kostenstelle=values(kostenstelle),
+            height=values(height),
+            length=values(length),
+            thickness=values(thickness),
+            weight=values(weight),
+            inserttime=values(inserttime),
+            job_id=values(job_id),
+            machine_no=values(machine_no),
+            login=values(login),
+            waregroup=values(waregroup),
+            addressfield=values(addressfield)
+          '''
+          cp = me.customerNumber.split '|'
+
+          sql  = sql.replace('{id}',message.machine_no*100000000+message.imprint_no)
+
+          sql  = sql.replace('{kundennummer}', cp[0])
+          sql  = sql.replace('{kostenstelle}', cp[1])
+
+          sql  = sql.replace('{height}',message.mail_height)
+          sql  = sql.replace('{length}',message.mail_length)
+          sql  = sql.replace('{thickness}',message.mail_thickness)
+          sql  = sql.replace('{weight}',message.mail_weight)
+
+          sql  = sql.replace('{job_id}',message.job_id)
+          sql  = sql.replace('{machine_no}',message.machine_no)
+          sql  = sql.replace('{waregroup}',me.waregroup)
+          sql  = sql.replace('{addressfield}',me.addressfield)
+
+          sql  = sql.replace('{login}','sorter')
+
+          fn = (err, connection) ->
+            if err
+              console.log err
+              ctrl = new bbs.Controller()
+              ctrl.setIP(args.machine_ip)
+              ctrl.on 'closed',(msg) ->
+                socket.emit('closed',msg)
+              ctrl.on 'ready', () ->
+                seq = ctrl.getStopPrintjob()
+                #seq.on 'end',() ->
+                #  ctrl.client.closeEventName='expected'
+                #  socket.emit('stop',{})
+                #  ctrl.close()
+                seq.run()
+
+                fn = () ->
+                  ctrl.client.closeEventName='expected'
+                  socket.emit('stop',{})
+                  console.log 'CLOSING (stop)!!!!'
+                  ctrl.close()
+                setTimeout fn, 2000
+
+                fs.exists '/opt/grab/customer.txt',(exists)->
+                  if exists
+                    fs.writeFile '/opt/grab/customer.txt', '', (err) ->
+                      if err
+                        console.log err
+                seq.run()
+
+              ctrl.open()
+            else
+              console.log 'write db'
+              connection.query sql, (err, rows, fields) ->
+                console.log 'write db returned'
+                if err
+                  console.log err.code
+
+                if err
+                  console.log err
+                  if err.code!='ER_DUP_KEY'
+                    ctrl = new bbs.Controller()
+                    ctrl.setIP(args.machine_ip)
+                    ctrl.on 'closed',(msg) ->
+                      socket.emit('closed',msg)
+                    ctrl.on 'ready', () ->
+                      seq = ctrl.getStopPrintjob()
+                      #seq.on 'end',() ->
+                      #  ctrl.client.closeEventName='expected'
+                      #  socket.emit('stop',{})
+                      #  ctrl.close()
+                      seq.run()
+
+                      fn = () ->
+                        ctrl.client.closeEventName='expected'
+                        socket.emit('stop',{})
+                        console.log 'CLOSING (stop)!!!!'
+                        ctrl.close()
+                      setTimeout fn, 2000
+
+                      fs.exists '/opt/grab/customer.txt',(exists)->
+                        if exists
+                          fs.writeFile '/opt/grab/customer.txt', '', (err) ->
+                            if err
+                              console.log err
+                      seq.run()
+
+                    ctrl.open()
+                connection.release()
+
+
+          pool.getConnection fn
+          socket.emit 'imprint', message
 
 
 
@@ -239,6 +244,18 @@ class Server extends Command
 
           socket.emit 'status',message
           return
+        if imprint=null
+          message =
+            no_machine: true
+            available_scale: 0
+            system_uid: 999
+            print_job_active: 0
+            print_job_id: me.job_id
+            interface_of_message: 9
+            type_of_message: 4340
+
+          socket.emit 'status',message
+          return
         ctrl = new bbs.Controller()
         ctrl.setIP(args.machine_ip)
         ctrl.on 'closed',(msg) ->
@@ -257,7 +274,9 @@ class Server extends Command
           me.start_without_printing = false
           socket.emit 'stop', {}
           return
-
+        if imprint=null
+          socket.emit 'stop', {}
+          return
         ctrl = new bbs.Controller()
         ctrl.setIP(args.machine_ip)
         ctrl.on 'closed',(msg) ->
@@ -304,6 +323,8 @@ class Server extends Command
         socket.emit 'start_without_printing', {}
 
       socket.on 'start', (message) ->
+        if imprint=null
+          return
         _start = () ->
           ctrl = new bbs.Controller()
           ctrl.setIP(args.machine_ip)
