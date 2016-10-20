@@ -245,7 +245,7 @@ class Server extends Command
 
           socket.emit 'status',message
           return
-        if imprint=null
+        if imprint is null
           message =
             no_machine: true
             available_scale: 0
@@ -275,7 +275,7 @@ class Server extends Command
           me.start_without_printing = false
           socket.emit 'stop', {}
           return
-        if imprint=null
+        if imprint is null
           socket.emit 'stop', {}
           return
         ctrl = new bbs.Controller()
@@ -324,7 +324,7 @@ class Server extends Command
         socket.emit 'start_without_printing', {}
 
       socket.on 'start', (message) ->
-        if imprint=null
+        if imprint is null
           return
         _start = () ->
           ctrl = new bbs.Controller()
