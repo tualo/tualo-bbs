@@ -68,7 +68,8 @@ class Server extends Command
     if args.machine_ip!='0'
       imprint = new bbs.Imprint args.machine_ip
       imprint.open()
-
+    else
+      console.log 'does not use a machine'
 
 
     io.on 'connection', (socket) ->
