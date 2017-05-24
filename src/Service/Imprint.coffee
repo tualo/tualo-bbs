@@ -55,10 +55,12 @@ class Imprint extends EventEmitter
     if @server == null
       #freeport (err,port) =>
       #@port = port
+
+      # half on is it correct there?
       options =
         family: 'IPv4'
         host: '0.0.0.0'
-        allowHalfOpen: true
+        allowHalfOpen: false
         pauseOnConnect: false
       @server = net.createServer options, (client) => @onClientConnect(client)
       @server.on 'error', (err) => @onServerError(err)
