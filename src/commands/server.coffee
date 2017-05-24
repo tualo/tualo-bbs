@@ -35,7 +35,7 @@ class Server extends Command
         password : 'sorter'
         database :  @args.hostdb
         connectionLimit: 100
-        wait_timeout: 28800
+        wait_timeout: 120
         connect_timeout: 10
 
       # flush table bbs_data
@@ -48,6 +48,7 @@ class Server extends Command
 
   startMySQL: () ->
     @startBBS()
+
   onDBError: (err) ->
     console.log '####################'
     console.log 'onDBError'
@@ -148,8 +149,11 @@ class Server extends Command
 
           sql  = sql.replace('{login}','sorter')
 
+
+
           fn = (err, connection) ->
             if err
+              console.log 'ERROR on MYSQL Connection'
               console.log err
               ctrl = new bbs.Controller()
               ctrl.setIP(args.machine_ip)
@@ -413,7 +417,9 @@ class Server extends Command
           seq.run()
         ctrl.open()
 
-    http.listen args.port,'0.0.0.0', () ->
+    console.log 'args.port',args.port
+    http.listen args.port, () ->
+
       console.log('listening on *:'+ args.port)
 
 
