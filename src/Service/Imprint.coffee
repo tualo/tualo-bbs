@@ -107,7 +107,7 @@ class Imprint extends EventEmitter
         @client.write sendbuffer
         console.log '>>>SEND ACK',sendbuffer
       else if message.type_of_message == Message.SERVICE_NEXT_IMPRINT
-        console.log 'imprint','TYPE_OPEN_SERVICE'
+        console.log 'imprint','SERVICE_NEXT_IMPRINT'
         @emit 'acting'
         ack = new MSG2DCACK
         ack.setServiceID Message.SERVICE_NEXT_IMPRINT
