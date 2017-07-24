@@ -3,6 +3,7 @@ path = require 'path'
 fs = require 'fs'
 
 app = require('express')()
+WebSocket = require('ws')
 http = require('http').Server(app)
 io = require('socket.io')(http)
 bbs = require('../main')
@@ -358,6 +359,10 @@ class Server extends Command
           else
             process.nextTick _start
         me.controller 'getStatusLight',doneFN, fnDone
+
+
+
+
 
     console.log 'args.port',args.port
     http.listen args.port, () ->
