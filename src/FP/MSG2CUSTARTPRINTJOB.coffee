@@ -33,7 +33,7 @@ class MSG2CUSTARTPRINTJOB extends Message
     @setMessageType Message.TYPE_BBS_START_PRINTJOB
 
     try
-      @advert = fs.readFileSync path.resolve(path.join( 'dat','empty.adv'))
+      @advert = fs.readFileSync path.resolve(path.join( '..','dat','empty.adv'))
     catch e
       console.log e
 

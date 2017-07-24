@@ -87,7 +87,7 @@ class MessageWrapper
       if message_type == Message.TYPE_BBS_START_PRINTJOB
         msg = new MSG2CUSTARTPRINTJOB
 
-      if message_type == Message.TYPE_BBS_STOP_PRINT_JOB
+      if message_type == Message.TYPE_BBS_STOP_PRINTJOB
         msg = new MSG2CUSTOPPRINTJOB
 
       if message_type == Message.TYPE_PREPARE_SIZE
