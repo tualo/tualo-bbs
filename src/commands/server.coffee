@@ -13,7 +13,7 @@ stats = sss()
 module.exports =
 class Server extends Command
   @commandName: 'server'
-  @commandArgs: ['port','machine_ip','hostsystem','hostdb']
+  @commandArgs: ['port','machine_ip','machine_port','hostsystem','hostdb']
   @commandShortDescription: 'running the bbs machine controll service'
   @options: []
 
@@ -56,6 +56,7 @@ class Server extends Command
     setTimeout process.exit, 5000
 
 
+#  controller: (sequence,) ->
   startBBS: () ->
     me = @
     me.customerNumber = '|'
@@ -133,20 +134,16 @@ class Server extends Command
           cp = me.customerNumber.split '|'
 
           sql  = sql.replace('{id}',message.machine_no*100000000+message.imprint_no)
-
           sql  = sql.replace('{kundennummer}', cp[0])
           sql  = sql.replace('{kostenstelle}', cp[1])
-
           sql  = sql.replace('{height}',message.mail_height)
           sql  = sql.replace('{length}',message.mail_length)
           sql  = sql.replace('{thickness}',message.mail_thickness)
           sql  = sql.replace('{weight}',message.mail_weight)
-
           sql  = sql.replace('{job_id}',message.job_id)
           sql  = sql.replace('{machine_no}',message.machine_no)
           sql  = sql.replace('{waregroup}',me.waregroup)
           sql  = sql.replace('{addressfield}',me.addressfield)
-
           sql  = sql.replace('{login}','sorter')
 
 
@@ -156,7 +153,7 @@ class Server extends Command
               console.log 'ERROR on MYSQL Connection'
               console.log err
               ctrl = new bbs.Controller()
-              ctrl.setIP(args.machine_ip)
+              ctrl.setIP(args.machine_ip,args.machine_port)
               ctrl.on 'closed',(msg) ->
                 socket.emit('closed',msg)
               ctrl.on 'ready', () ->
@@ -193,7 +190,7 @@ class Server extends Command
                   console.log err
                   if err.code!='ER_DUP_KEY'
                     ctrl = new bbs.Controller()
-                    ctrl.setIP(args.machine_ip)
+                    ctrl.setIP(args.machine_ip,args.machine_port)
                     ctrl.on 'closed',(msg) ->
                       socket.emit('closed',msg)
                     ctrl.on 'ready', () ->
@@ -262,7 +259,7 @@ class Server extends Command
           socket.emit 'status',message
           return
         ctrl = new bbs.Controller()
-        ctrl.setIP(args.machine_ip)
+        ctrl.setIP(args.machine_ip,args.machine_port)
         ctrl.on 'closed',(msg) ->
           socket.emit('closed',msg)
         ctrl.on 'ready',() ->
@@ -283,7 +280,7 @@ class Server extends Command
           socket.emit 'stop', {}
           return
         ctrl = new bbs.Controller()
-        ctrl.setIP(args.machine_ip)
+        ctrl.setIP(args.machine_ip,args.machine_port)
         ctrl.on 'closed',(msg) ->
           socket.emit('closed',msg)
         ctrl.on 'ready', () ->
@@ -332,7 +329,7 @@ class Server extends Command
           return
         _start = () ->
           ctrl = new bbs.Controller()
-          ctrl.setIP(args.machine_ip)
+          ctrl.setIP(args.machine_ip,args.machine_port)
           ctrl.on 'closed',(msg) ->
             socket.emit('closed',msg)
           ctrl.on 'ready', () ->
@@ -384,7 +381,7 @@ class Server extends Command
           ctrl.open()
 
         ctrl = new bbs.Controller()
-        ctrl.setIP(args.machine_ip)
+        ctrl.setIP(args.machine_ip,args.machine_port)
         ctrl.on 'closed',(msg) ->
           socket.emit('closed',msg)
 
@@ -395,7 +392,7 @@ class Server extends Command
             ctrl.close()
             if message.print_job_active==1
               ctrl = new bbs.Controller()
-              ctrl.setIP(args.machine_ip)
+              ctrl.setIP(args.machine_ip,args.machine_port)
               ctrl.on 'closed',(msg) ->
                 socket.emit('closed',msg)
               ctrl.on 'ready', () ->

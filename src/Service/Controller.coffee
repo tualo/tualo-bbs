@@ -19,8 +19,9 @@ class Controller extends EventEmitter
   setPort: (val) ->
     @port = val
 
-  setIP: (val) ->
+  setIP: (val,port) ->
     @ip = val
+    @port = port
 
   resetPingTimer: () ->
     @stopPingTimer()
