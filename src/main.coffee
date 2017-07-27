@@ -20,6 +20,7 @@ global.error = (tag,msg) ->
 
 
 classNames = [
+  'WebSocketConnection',
   'Controller',
   'Imprint'
 ]

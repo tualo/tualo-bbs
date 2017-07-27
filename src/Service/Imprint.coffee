@@ -65,13 +65,17 @@ class Imprint extends EventEmitter
       @server = net.createServer options, (client) => @onClientConnect(client)
       @server.on 'error', (err) => @onServerError(err)
       @server.on 'close', () => @onServerClose()
-      @server.listen @port,@getIP(), () => @onServerBound()
+      @server.listen 0, @getIP(), () => @onServerBound()
 
   onServerError: (err) ->
     console.error err
 
   onServerBound: () ->
     @address = @server.address()
+
+    @port = @address.port
+    @ip = @address.address
+
 
     console.log @address
     @resetTimeoutTimer()

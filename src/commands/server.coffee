@@ -47,16 +47,28 @@ class Server extends Command
       @connection.on 'error', (err) => @onDBError
       @startMySQL()
 
-
-
   startMySQL: () ->
-    @startBBS()
+    @openWebSocket()
+
+
+  openWebSocket: () ->
+    @wsserver = new WebSocket.Server({ port: @args.port })
+    @wsserver.on 'connection', (ws) =>
+      @onWebSocketClientConnect ws
+
+
+  onWebSocketClientConnect: (ws) ->
+    new bbs.WebSocketConnection(ws,@jobfile,@args.machine_ip)
+    #@startBBS()
 
   onDBError: (err) ->
     console.log '####################'
     console.log 'onDBError'
     console.trace err
     setTimeout process.exit, 5000
+
+
+  ##########################################
 
   currentJob: (job) ->
     console.log('set job: ',job)
@@ -111,7 +123,7 @@ class Server extends Command
     doneFN = (doneMessage) =>
       console.log 'startJob','doneFN'
       me.currentJob message.job_id
-      socket.emit 'start',doneMessage
+      socket.send me.getWSMessage('start',doneMessage)
 
     runSeq = (seq) ->
       seq.init()
@@ -151,14 +163,15 @@ class Server extends Command
 
 
   getStatus: (socket) ->
+    me = @
     closeFN = (message) =>
       #@currentJob ''
       console.log 'getStatus','closeFN'
-      socket.emit('close',message)
+      socket.send(me.getWSMessage('close',message))
     doneFN = (message) =>
       #@currentJob ''
-      console.log 'getStatus','doneFN',message
-      socket.emit('status',message)
+      console.log 'getStatus','doneFN'
+      socket.send(me.getWSMessage('status',message))
     @controller 'getStatusLight',closeFN,doneFN
 
   startBBS: () ->
@@ -178,197 +191,78 @@ class Server extends Command
       console.log 'does not use a machine'
 
 
-    io.on 'connection', (socket) ->
-      socket.on 'disconnect', () ->
-        if me.imprint!=null
-          me.imprint.removeAllListeners()
+    @openWebSocket()
 
-      if me.imprint!=null
-        me.imprint.on 'acting', () ->
-          # ok it's time to copy files
+  openWebSocketXY: () ->
+    @wsserver = new WebSocket.Server({ port: @args.port })
+    @wsserver.on 'connection', (ws) =>
+      @onWebSocketClientConnect ws
 
-
-        me.imprint.on 'imprint', (message) ->
-          sql = '''
-          insert into bbs_data
-          (
-            id,
-            kundennummer,
-            kostenstelle,
-            height,
-            length,
-            thickness,
-            weight,
-            inserttime,
-            job_id,
-            machine_no,
-            login,
-            waregroup,
-            addressfield
-          ) values (
-            {id},
-            {kundennummer},
-            {kostenstelle},
-            {height},
-            {length},
-            {thickness},
-            {weight},
-            now(),
-            {job_id},
-            {machine_no},
-            '{login}',
-            '{waregroup}',
-            '{addressfield}'
-          )
-          on duplicate key update
-
-            kundennummer=values(kundennummer),
-            kostenstelle=values(kostenstelle),
-            height=values(height),
-            length=values(length),
-            thickness=values(thickness),
-            weight=values(weight),
-            inserttime=values(inserttime),
-            job_id=values(job_id),
-            machine_no=values(machine_no),
-            login=values(login),
-            waregroup=values(waregroup),
-            addressfield=values(addressfield)
-          '''
-          cp = me.customerNumber.split '|'
-
-          sql  = sql.replace('{id}',message.machine_no*100000000+message.imprint_no)
-          sql  = sql.replace('{kundennummer}', cp[0])
-          sql  = sql.replace('{kostenstelle}', cp[1])
-          sql  = sql.replace('{height}',message.mail_height)
-          sql  = sql.replace('{length}',message.mail_length)
-          sql  = sql.replace('{thickness}',message.mail_thickness)
-          sql  = sql.replace('{weight}',message.mail_weight)
-          sql  = sql.replace('{job_id}',message.job_id)
-          sql  = sql.replace('{machine_no}',message.machine_no)
-          sql  = sql.replace('{waregroup}',me.waregroup)
-          sql  = sql.replace('{addressfield}',me.addressfield)
-          sql  = sql.replace('{login}','sorter')
+  onWebSocketClientConnectYXS: (ws) ->
+    ws.on 'message', (message) =>
+      @onWebSocketClientIncomingMessage(ws,message)
 
 
+  onWebSocketClientIncomingMessage: (ws,message) ->
+    o = JSON.parse(message)
+    if (o.event)
+      @processIncomingMessage ws, o.event, o.data
 
-          fn = (err, connection) ->
-            if err
-              console.log 'ERROR on MYSQL Connection'
-              console.log err
-              me.stopJob socket
+  processIncomingMessage: (ws,event,message) ->
+    me = @
+    if typeof me['process_'+event]=='function'
+      me['process_'+event](ws,message)
 
+  process_start: (ws,message) ->
+    me = @
+    if me.imprint is null
+      return
+    _start = () ->
+      console.log 'start message', message
+      me.startJob ws,message
 
-            else
-              console.log 'write db'
-              connection.query sql, (err, rows, fields) ->
-                console.log 'write db returned'
-                if err
-                  console.log err.code
+    fnDone = () ->
+      #console.log
+    doneFN = (doneMessage) =>
+      me.currentJob ''
+      if message.print_job_active==1
+        fnStopJob = (dMessage) =>
+          process.nextTick _start
+        me.controller 'getStopPrintjob',fnStopJob, fnDone
+      else
+        process.nextTick _start
+    me.controller 'getStatusLight',doneFN, fnDone
 
-                if err
-                  console.log err
-                  if err.code!='ER_DUP_KEY'
-                    me.stopJob socket
-                connection.release()
+  process_status: (ws,message) ->
+    me = @
+    if me.start_without_printing == true
+      message =
+        available_scale: 0
+        system_uid: 999
+        print_job_active: 1
+        print_job_id: me.job_id
+        interface_of_message: 9
+        type_of_message: 4340
 
+      ws.send me.getWSMessage('status',message)
+      return
+    if me.imprint is null
+      message =
+        no_machine: true
+        available_scale: 0
+        system_uid: 999
+        print_job_active: 0
+        print_job_id: me.job_id
+        interface_of_message: 9
+        type_of_message: 4340
 
-          pool.getConnection fn
-          socket.emit 'imprint', message
-
-
-
-      socket.on 'service', (message) ->
-        if message.type=='status'
-          if message.name=='grab'
-            me.checkGrabService socket, message
-          if message.name=='ocrsd'
-            me.checkOCRService socket, message
-        if message.type=='stop'
-          if message.name=='ocrsd' or message.name=='grab'
-            me.statusService socket, message
-
-      socket.on 'status', () ->
-        if me.start_without_printing == true
-          message =
-            available_scale: 0
-            system_uid: 999
-            print_job_active: 1
-            print_job_id: me.job_id
-            interface_of_message: 9
-            type_of_message: 4340
-
-          socket.emit 'status',message
-          return
-        if me.imprint is null
-          message =
-            no_machine: true
-            available_scale: 0
-            system_uid: 999
-            print_job_active: 0
-            print_job_id: me.job_id
-            interface_of_message: 9
-            type_of_message: 4340
-
-          socket.emit 'status',message
-          return
-        me.getStatus socket
+      ws.send me.getWSMessage('status',message)
+      return
+    me.getStatus ws
 
 
-
-      socket.on 'stop', () ->
-        if me.start_without_printing == true
-          me.start_without_printing = false
-          socket.emit 'stop', {}
-          return
-        if me.imprint is null
-          socket.emit 'stop', {}
-          return
-        me.stopJob socket
-        #ctrl.open()
-
-      socket.on 'serverStatus', (message) ->
-        stats.check 'memory', (obj) ->
-          socket.emit 'serverStatus', obj
-
-      socket.on 'start_without_printing', (message) ->
-        me.start_without_printing = true
-        me.customerNumber = message.customerNumber
-        me.currentJob message.jobid
-        if message.waregroup?
-          me.waregroup = message.waregroup
-        me.job_id = message.job_id
-        socket.emit 'start_without_printing', {}
-
-      socket.on 'start', (message) ->
-        if me.imprint is null
-          return
-        _start = () ->
-          console.log 'start message', message
-          me.startJob socket,message
-
-
-        fnDone = () ->
-          #console.log
-        doneFN = (doneMessage) =>
-          me.currentJob ''
-          if message.print_job_active==1
-            fnStopJob = (dMessage) =>
-              process.nextTick _start
-            me.controller 'getStopPrintjob',fnStopJob, fnDone
-          else
-            process.nextTick _start
-        me.controller 'getStatusLight',doneFN, fnDone
-
-
-
-
-
-    console.log 'args.port',args.port
-    http.listen args.port, () ->
-
-      console.log('listening on *:'+ args.port)
-
+  getWSMessage: (evt,data) ->
+    JSON.stringify({event: evt,data: data})
 
 
   startStopService: (socket,cmd)->
