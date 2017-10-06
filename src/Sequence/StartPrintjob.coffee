@@ -55,30 +55,37 @@ class StartPrintjob extends Sequence
     @start_message.setImprintChannelPort parseInt(val)
 
   init: () ->
+    console.log 'StartPrintjob', 'init'
     @start_message = new MSG2CUSTARTPRINTJOB
   run: () ->
+    console.log 'StartPrintjob', 'run'
     @once 'message', (message) => @onOpenService(message)
     @sendOpenService Message.SERVICE_BBS_PRINTJOB
 
   onOpenService: (message) ->
-    console.log 'on onOpenService'
+    console.log 'StartPrintjob', 'onOpenService',message
     if message.type_of_message == Message.TYPE_ACK and message.serviceID == Message.SERVICE_BBS_PRINTJOB
+      console.log 'StartPrintjob', 'expected',message
       @once 'message', (message) => @onStartPrintJob(message)
       @startPrintJob()
     else
+      console.log 'StartPrintjob', 'unexpected', message
       @unexpected message
 
   onCloseService: (message) ->
-    console.log 'on onCloseService'
+    console.log 'StartPrintjob', 'onCloseService', message
     if message.type_of_message == Message.TYPE_ACK# and message.serviceID == Message.SERVICE_BBS_PRINTJOB
+      console.log 'StartPrintjob', 'expected', message
       @end()
     else
+      console.log 'StartPrintjob', 'unexpected', message
       @unexpected message
 
   onStartPrintJob: (message) ->
-    console.log 'on onStartPrintJob',message
+    console.log 'StartPrintjob', 'onStartPrintJob', message
 
     if message.type_of_message == Message.TYPE_BBS_START_PRINTJOB
+      console.log 'StartPrintjob', 'TYPE_BBS_START_PRINTJOB', message
       console.log 'TYPE_BBS_START_PRINTJOB'
       @message = message
 
@@ -86,8 +93,11 @@ class StartPrintjob extends Sequence
       @sendCloseService()
       console.log 'ok closing'
     else if message.type_of_message == Message.TYPE_ACK
+      console.log 'StartPrintjob', 'TYPE_ACK', message
       console.log 'TYPE_ACK'
       @sendCloseService()
+    else
+      console.log 'StartPrintjob', '!!!!TYPE_ACK', message.type_of_message
     #else
     #  @unexpected message
 
@@ -96,8 +106,8 @@ class StartPrintjob extends Sequence
     sendbuffer = @start_message.toFullByteArray()
     sizemessage = new MSG2CUPREPARESIZE
     sizemessage.setSize sendbuffer.length
-    console.log "> ", sizemessage.getBuffer()
+    console.log "sizemessage> ", sizemessage.getBuffer()
     @client.write sizemessage.getBuffer()
 
-    console.log "> ", sendbuffer
+    console.log "sendbuffer> ", sendbuffer
     @client.write sendbuffer
