@@ -98,6 +98,7 @@ class StartPrintjob extends Sequence
       @sendCloseService()
     else
       console.log 'StartPrintjob', '!!!!TYPE_ACK', message.type_of_message
+      @unexpected message
     #else
     #  @unexpected message
 

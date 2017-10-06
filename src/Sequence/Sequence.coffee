@@ -28,6 +28,9 @@ class Sequence extends EventEmitter
     @emit 'unexpected', message
 
   onData: (data) ->
+    console.log '##############################'
+    console.log '<<<<','Sequence','onData',data
+    console.log '##############################'
     message = MessageWrapper.getMessageObject data
     if message==-1
       return
