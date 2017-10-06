@@ -10,8 +10,8 @@ class MSG2CUSTARTPRINTJOB extends Message
     @customer_id = 1
     @print_date = 1
     @date_ahead = 0
-    @weightmode = 2
-    @print_offset = 78
+    @weightmode = 3
+    @print_offset = 0
     @imageid = 1
     @print_endorsement = 1
     @endorsement_id = 0
