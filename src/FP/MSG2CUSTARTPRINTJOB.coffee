@@ -95,6 +95,7 @@ class MSG2CUSTARTPRINTJOB extends Message
     position+=4
 
     if @bbs_version==2
+
       @imageid = data.readUInt32BE position
       position+=4
 
@@ -156,8 +157,9 @@ class MSG2CUSTARTPRINTJOB extends Message
     position+=1
     @app_data.writeUInt32BE @print_offset, position # offset in mm
     position+=4
-    @app_data.writeUInt32BE @imageid, position
-    position+=4
+    if @bbs_version==2
+      @app_data.writeUInt32BE @imageid, position
+      position+=4
     @app_data.writeUInt8 @print_endorsement, position
     position+=1
     @app_data.writeUInt32BE @endorsement_id, position
@@ -176,13 +178,14 @@ class MSG2CUSTARTPRINTJOB extends Message
     position+=4
     @advert.copy @app_data, position
     position+=@advert.length
-
-    @app_data.writeUInt32BE @town_circle_id, position
-    position+=4
-    @app_data.writeUInt32BE @town_circle.length, position
-    position+=4
-    @app_data.write @town_circle,position, "ascii"
-    position+=@town_circle.length
+    if @bbs_version==2
+      @app_data.writeUInt32BE @town_circle_id, position
+      position+=4
+      @app_data.writeUInt32BE @town_circle.length, position
+      position+=4
+      @app_data.write @town_circle,position, "ascii"
+      position+=@town_circle.length
+      
     @app_data.writeUInt32BE @customer_number.length, position
     position+=4
     @app_data.write @customer_number,position, "ascii"
