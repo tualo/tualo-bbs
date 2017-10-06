@@ -244,8 +244,12 @@ class HttpServer extends Command
   expressStartJob: (req, res) ->
     me = @
     try
-      bodymessage = JSON.parse(req.body.message)
-
+      bodymessage = {}
+      try
+        bodymessage = JSON.parse(req.body.message)
+      catch e
+        console.log e
+        
       message = {
         job_id: 1,
         weight_mode: 3,
@@ -380,12 +384,11 @@ class HttpServer extends Command
     errorFN = (errMessage) =>
       console.log 'getStatus (timed)','onError',errMessage
       me.lastError = errMessage
-      setTimeout me.getStatusTimed.bind(me), 1000
     closeFN = (message) =>
       console.log 'getStatus (timed)','closeFN'
+      setTimeout me.getStatusTimed.bind(me), 1000
     doneFN = (message) =>
       console.log 'getStatus (timed)','doneFN'
       me.lastError=null
       me.lastState = message
-      setTimeout me.getStatusTimed.bind(me), 1000
     @controller 'getStatusLight',closeFN,doneFN,errorFN,null
