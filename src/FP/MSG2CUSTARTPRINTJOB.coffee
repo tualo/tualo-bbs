@@ -7,6 +7,7 @@ class MSG2CUSTARTPRINTJOB extends Message
 
   constructor: () ->
     @bbs_version = process.env.BBS_VERSION || 2
+    @bbs_version = parseInt(@bbs_version)
     @job_id = 1
     @customer_id = 1
     @print_date = 1

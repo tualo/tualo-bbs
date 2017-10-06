@@ -6,6 +6,7 @@ class MSG2HSNEXTIMPRINT extends Message
   constructor: () ->
     @type = 'MSG2HSNEXTIMPRINT'
     @bbs_version = process.env.BBS_VERSION || 2
+    @bbs_version = parseInt(@bbs_version)
     @job_id = 0
     @customer_id = 0
     @machine_no = 0
