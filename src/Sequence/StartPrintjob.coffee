@@ -107,8 +107,9 @@ class StartPrintjob extends Sequence
     sendbuffer = @start_message.toFullByteArray()
     sizemessage = new MSG2CUPREPARESIZE
     sizemessage.setSize sendbuffer.length
-    console.log "sizemessage> ", sizemessage.getBuffer().toString(16)
+    console.log "sizemessage> ", sizemessage.getBuffer().toString('hex')
     @client.write sizemessage.getBuffer()
 
-    console.log "sendbuffer> ", sendbuffer.toString(16)
+    console.log "sendbuffer> ", sendbuffer.toString('hex')
+    console.log "image> ", start_message.advert.toString('hex')
     @client.write sendbuffer
