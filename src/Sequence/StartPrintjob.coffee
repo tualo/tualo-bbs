@@ -103,7 +103,7 @@ class StartPrintjob extends Sequence
     #  @unexpected message
 
   startPrintJob: () ->
-    console.log "start message",@start_message
+    console.log "start message>",@start_message
     sendbuffer = @start_message.toFullByteArray()
     sizemessage = new MSG2CUPREPARESIZE
     sizemessage.setSize sendbuffer.length
@@ -111,5 +111,6 @@ class StartPrintjob extends Sequence
     @client.write sizemessage.getBuffer()
 
     console.log "sendbuffer> ", sendbuffer.toString('hex')
-    console.log "image> ", start_message.advert.toString('hex')
+    console.log "image> ", @start_message.advert.toString('hex')
+    console.log "image> ", @start_message.advert.toString('base64')
     @client.write sendbuffer
