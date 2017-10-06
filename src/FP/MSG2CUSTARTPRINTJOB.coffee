@@ -89,8 +89,11 @@ class MSG2CUSTARTPRINTJOB extends Message
     position+=1
     @print_offset = data.readUInt32BE position # offset in mm
     position+=4
-    @imageid = data.readUInt32BE position
-    position+=4
+
+
+    #@imageid = data.readUInt32BE position
+    #position+=4
+
     @print_endorsement = data.readUInt8 position
     position+=1
     @endorsement_id = data.readUInt32BE position
@@ -110,17 +113,17 @@ class MSG2CUSTARTPRINTJOB extends Message
     @advert = data.slice position, position+ @advert_length
     position+=@advert_length
 
-    @town_circle_id = data.readUInt32BE  position
-    position+=4
-    @town_circle_length = data.readUInt32BE position
-    position+=4
-    @town_circle = data.slice(position,position + @town_circle_length).toString("ascii")
+    #@town_circle_id = data.readUInt32BE  position
+    #position+=4
+    #@town_circle_length = data.readUInt32BE position
+    #position+=4
+    #@town_circle = data.slice(position,position + @town_circle_length).toString("ascii")
 
-    position+=@town_circle_length
-    @customer_number_length = data.readUInt32BE  position
-    position+=4
-    @customer_number = data.slice(position, position+@customer_number_length).toString("ascii")
-    position+=@customer_number_length
+    #position+=@town_circle_length
+    #@customer_number_length = data.readUInt32BE  position
+    #position+=4
+    #@customer_number = data.slice(position, position+@customer_number_length).toString("ascii")
+    #position+=@customer_number_length
 
     cutof = position
     @imprint_channel_ip_length = data.readUInt32BE position
