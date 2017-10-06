@@ -86,6 +86,7 @@ class MessageWrapper
 
       if message_type == Message.TYPE_BBS_START_PRINTJOB
         msg = new MSG2CUSTARTPRINTJOB
+        
 
       if message_type == Message.TYPE_BBS_STOP_PRINTJOB
         msg = new MSG2CUSTOPPRINTJOB
@@ -102,8 +103,6 @@ class MessageWrapper
       if message_type == Message.TYPE_BBS_NEXT_IMPRINT
         msg = new MSG2HSNEXTIMPRINT
 
-      if message_type == Message.TYPE_BBS_NEXT_IMPRINT
-        msg = new MSG2HSNEXTIMPRINT
 
       if msg == null
         msg = new MSG2DCNAK()

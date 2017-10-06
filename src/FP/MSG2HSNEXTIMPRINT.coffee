@@ -5,7 +5,7 @@ class MSG2HSNEXTIMPRINT extends Message
 
   constructor: () ->
     @type = 'MSG2HSNEXTIMPRINT'
-
+    @bbs_version = process.env.BBS_VERSION || 2
     @job_id = 0
     @customer_id = 0
     @machine_no = 0
@@ -22,6 +22,8 @@ class MSG2HSNEXTIMPRINT extends Message
     @setMessageInterface Message.INTERFACE_DI
     @setMessageType Message.TYPE_BBS_NEXT_IMPRINT
 
+  setBBSVersion: (val) ->
+    @bbs_version = val
 
   setJobId: (val) ->
     @job_id = val
@@ -65,7 +67,8 @@ class MSG2HSNEXTIMPRINT extends Message
     position+=8
 
     @endorsement_id = data.readUInt32BE position+=4
-    @town_circle_id = data.readUInt32BE position+=4
+    if @bbs_version==2
+      @town_circle_id = data.readUInt32BE position+=4
     @mail_length = data.readInt32BE position+=4
     @mail_height = data.readInt32BE position+=4
     @mail_thickness = data.readInt32BE position+=4
@@ -95,8 +98,10 @@ class MSG2HSNEXTIMPRINT extends Message
 
     data.writeUInt32BE @endorsement_id, position
     position+=4
-    data.writeUInt32BE @town_circle_id, position
-    position+=4
+    if @bbs_version==2
+      data.writeUInt32BE @town_circle_id, position
+      position+=4
+
     data.writeUInt32BE @mail_length, position
     position+=4
     data.writeUInt32BE @mail_height, position
