@@ -14,23 +14,23 @@ module.exports =
 class StartPrintjob extends Sequence
 
   setJobId: (val) ->
-    @start_message.setJobId val
+    @start_message.setJobId parseInt(val)
   setCustomerId: (val) ->
-    @start_message.setCustomerId val
+    @start_message.setCustomerId parseInt(val)
   setPrintDate: (val) ->
-    @start_message.setPrintDate val
+    @start_message.setPrintDate parseInt(val)
   setDateAhead: (val) ->
-    @start_message.setDateAhead val
+    @start_message.setDateAhead parseInt(val)
   setWeightMode: (val) ->
-    @start_message.setWeightMode val
+    @start_message.setWeightMode parseInt(val)
   setPrintOffset: (val) ->
-    @start_message.setPrintOffset val
+    @start_message.setPrintOffset parseInt(val)
   setImageId: (val) ->
-    @start_message.setImageId val
+    @start_message.setImageId parseInt(val)
   setPrintEndorsement: (val) ->
-    @start_message.setPrintEndorsement val
+    @start_message.setPrintEndorsement parseInt(val)
   setEndorsementID: (val) ->
-    @start_message.setEndorsementID val
+    @start_message.setEndorsementID parseInt(val)
   setEndorsementText1: (val) ->
     @start_message.setEndorsementText1 val
   setEndorsementText2: (val) ->
@@ -44,7 +44,7 @@ class StartPrintjob extends Sequence
       @start_message.setAdvert new Buffer(val,'base64')
 
   setTownCircleID: (val) ->
-    @start_message.setTownCircleID val
+    @start_message.setTownCircleID parseInt(val)
   setTownCircle: (val) ->
     @start_message.setTownCircle val
   setCustomerNumber: (val) ->

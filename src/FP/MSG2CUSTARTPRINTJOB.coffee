@@ -185,7 +185,7 @@ class MSG2CUSTARTPRINTJOB extends Message
       position+=4
       @app_data.write @town_circle,position, "ascii"
       position+=@town_circle.length
-      
+
     @app_data.writeUInt32BE @customer_number.length, position
     position+=4
     @app_data.write @customer_number,position, "ascii"
