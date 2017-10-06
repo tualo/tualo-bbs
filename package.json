@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "colors": "^1.1.2",
-    "express": "^4.13.4",
+    "express": "^4.16.1",
     "freeport": "^1.0.5",
     "mysql": "^2.11.1",
     "simple-stats-server": "0.0.5",

@@ -150,6 +150,7 @@ class Imprint extends EventEmitter
 
   onClientClose: () ->
     @client = null
+    console.error 'onClientClose()'
 
   onClientError: (err) ->
     console.error 'client error', err
@@ -158,8 +159,10 @@ class Imprint extends EventEmitter
     if @client?#!=null
       @client.end()
 
+    console.error 'close()'
     @server.close()
 
   onServerClose: () ->
+    console.error 'onServerClose'
     @stopTimeoutTimer()
     @emit "closed"

@@ -22,12 +22,13 @@ class Status extends Command
 
     if args.ip
       @ctrl = new Controller
+      @ctrl.setPort 4444
       @ctrl.setIP args.ip
       @ctrl.on 'ready', ()=>@onReady()
       @ctrl.open()
 
   onReady: () ->
-
+    console.log 'onReady'
     seq = @ctrl.getStatusLight()
     seq.on 'end', (message) => @onSequenceEnd(message)
     seq.run()

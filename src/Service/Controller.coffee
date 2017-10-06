@@ -15,13 +15,15 @@ class Controller extends EventEmitter
     @port = 4444 # fixed
     @client = null
     @closingService = false
+    console.log @
 
   setPort: (val) ->
     @port = val
 
   setIP: (val,port) ->
     @ip = val
-    @port = port
+    if port
+      @port = port
 
   resetPingTimer: () ->
     @stopPingTimer()
@@ -49,21 +51,24 @@ class Controller extends EventEmitter
   open: () ->
     me = @
     if @client==null
+      console.log 'PORT',@port
       @client = Net.createConnection @port, @ip, () => @onConnect()
       @closeEventName = 'unexpected_closed'
-      @client.setTimeout 20000
+      @client.setTimeout 2000
       @client.on 'error', (err) ->
-        me.emit 'err', err
+        console.trace err
+        me.emit 'error', err
         me.close()
       @client.on 'close', () ->
-        console.log 'controller close',@closeEventName
-        me.emit 'closed',@closeEventName
+        console.log 'controller close',me.closeEventName
+        me.emit 'closed',me.closeEventName
       @client.on 'end', () ->
         console.log 'controller end'
         me.emit 'ended'
+      console.log '-----'
 
   onConnect: () ->
-
+    console.log 'onConnect'
     @resetTimeoutTimer()
     @client.setNoDelay true
     @client.on 'close', () => @onClose()

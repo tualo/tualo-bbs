@@ -267,7 +267,7 @@ class Server extends Command
 
   startStopService: (socket,cmd)->
     spawn = require('child_process').spawn
-    proc = spawn('serice', [cmd.name, cmd.type])
+    proc = spawn('service', [cmd.name, cmd.type])
     proc.on 'close', (code) ->
       val =
         service: cmd.name
