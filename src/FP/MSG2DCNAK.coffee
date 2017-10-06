@@ -26,6 +26,7 @@ class MSG2DCNAK extends Message
     @errorCode = data.readUInt16BE 2
     console.warn "Error Service: " + (@serviceID.toString(16))
     console.warn "Error Code: " + (@errorCode.toString(16))
+    console.warn "Error DATA: " + (data.toString(16))
     if (@errorCode==0)
       console.warn "unkown error"
     else if (@errorCode==1)

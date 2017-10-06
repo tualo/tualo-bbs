@@ -259,15 +259,15 @@ class HttpServer extends Command
         addressfield: 'L',
         print_date: 1,
         print_endorsement: 1,
-        endorsement1: 'endorsement1',
-        endorsement2: 'endorsement2',
+        endorsement1: 'endors',
+        endorsement2: 'endors',
         advert: '02042a3d422a7b9884329e0df9000000006a0000000000000000000000b93c00000000000000002102220100000000000000000000000000002c00000039004d00ffffffffffffffff0b0057657262756e672d3034001200f3fb07f3f12a03f6f3fbfff3fbfff3fb16f502072a3d422a7b9884c6a899bb00000000120000000000000000000000'
       }
 
       for k,v of message
         if bodymessage.hasOwnProperty(k)
           message[k]=bodymessage[k]
-      
+
       me.lastStartJobMessage = message
       errorFN = (errMessage) =>
         console.log 'startJob','errorFN',errMessage
