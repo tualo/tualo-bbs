@@ -377,8 +377,9 @@ class HttpServer extends Command
       if typeof runseq=='function'
         runseq seq
 
-      console.log '->->->->->->->->->->','add end event'
+      console.log '->*******','add end event'
       seq.on 'end',(endMsg) ->
+        console.log '->',sequenceFN,'->',endMsg
         console.log 'controller',sequenceFN,'sequence end'
         if typeof onDone=='function'
           onDone endMsg
