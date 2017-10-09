@@ -111,6 +111,7 @@ class Controller extends EventEmitter
 
   onEnd: () ->
     #@emit "end"
+    console.log 'onEnd'
     @client.close()
     #@client=null
 
