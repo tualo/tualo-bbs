@@ -362,42 +362,47 @@ class HttpServer extends Command
 
 
   controller: (sequenceFN,onClosed,onDone,onError,runseq) ->
+    me = @
     args = @args
-    ctrl = new bbs.Controller()
-    ctrl.setIP(args.machine_ip,args.machine_port)
-    ctrl.on 'error',(msg) ->
-      if typeof onError=='function'
-        onError msg
-    ctrl.on 'closed',(msg) ->
-      console.log 'controller',sequenceFN,'ctrl close'
-      onClosed msg
-    ctrl.on 'ready', () ->
-      console.log 'controller',sequenceFN,'ready'
-      seq = ctrl[sequenceFN]()
-      if typeof runseq=='function'
-        runseq seq
+    if me.queryIsRunning
+      deferFN = () ->
+        me.controller(sequenceFN,onClosed,onDone,onError,runseq).bind(me)
 
-      console.log '->*******','add end event'
-      seq.on 'end',(endMsg) ->
-        console.log '->',sequenceFN,'->',endMsg
-        console.log 'controller',sequenceFN,'sequence end'
-        if typeof onDone=='function'
-          onDone endMsg
-        ctrl.close()
-      seq.run()
-    ctrl.open()
+      setTimeout deferFN,1500
+    else
+      me.queryIsRunning = true
+      ctrl = new bbs.Controller()
+      ctrl.setIP(args.machine_ip,args.machine_port)
+      ctrl.on 'error',(msg) ->
+        me.queryIsRunning = false
+        if typeof onError=='function'
+          onError msg
+      ctrl.on 'closed',(msg) ->
+        console.log 'controller',sequenceFN,'ctrl close'
+        onClosed msg
+      ctrl.on 'ready', () ->
+        me.queryIsRunning = false
+        seq = ctrl[sequenceFN]()
+        if typeof runseq=='function'
+          runseq seq
+        seq.on 'end',(endMsg) ->
+          if typeof onDone=='function'
+            onDone endMsg
+          ctrl.close()
+        seq.run()
+      ctrl.open()
 
   getStatusTimed: () ->
     me = @
     errorFN = (errMessage) =>
       console.log 'getStatus (timed)','onError', 'next ping in 30s',errMessage
       me.lastError = errMessage
-      #setTimeout me.getStatusTimed.bind(me), 30000
+      setTimeout me.getStatusTimed.bind(me), 30000
     closeFN = (message) =>
       console.log 'getStatus (timed)','closeFN'
     doneFN = (message) =>
       console.log 'getStatus (timed)','doneFN', 'next ping in 5s'
       me.lastError=null
       me.lastState = message
-      #setTimeout me.getStatusTimed.bind(me), 5000
+      setTimeout me.getStatusTimed.bind(me), 5000
     @controller 'getStatusLight',closeFN,doneFN,errorFN,null
