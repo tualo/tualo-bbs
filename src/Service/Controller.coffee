@@ -113,13 +113,14 @@ class Controller extends EventEmitter
     #@emit "end"
     console.log 'onEnd'
     if typeof @client!='undefined' and @client != null
+      @lasteventname = @client.closeEventName
       @client.destroy()
       console.log 'onEnd', @client
       @client=null
 
   onClose: () ->
     #@stopTimeoutTimer()
-    @emit "closed",@client.closeEventName
+    @emit "closed",@lasteventname
     @client=null
 
 
