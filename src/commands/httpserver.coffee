@@ -246,94 +246,97 @@ class HttpServer extends Command
   expressStartJob: (req, res) ->
     me = @
     try
-      bodymessage = {}
-      try
-        bodymessage = JSON.parse(req.body.message)
-        console.log '########################'
-        console.log '########################'
-        console.log bodymessage
-        console.log '########################'
-        console.log '########################'
-      catch e
-        console.log e
+      if me.lastState.print_job_active==1
+        res.send(JSON.stringify({success: false,msg: "Es wird bereits ein Druckauftrag asugeführt"}))
+      else
+        bodymessage = {}
+        try
+          bodymessage = JSON.parse(req.body.message)
+          console.log '########################'
+          console.log '########################'
+          console.log bodymessage
+          console.log '########################'
+          console.log '########################'
+        catch e
+          console.log e
 
-      message = {
-        job_id: 1,
-        weight_mode: 3,
-        customerNumber: '69000|0',
-        kundennummer: '69000',
-        kostenstelle: 0,
-        waregroup: 'Standardsendungen',
-        label_offset: 0,
-        date_offset: 0,
-        stamp: 1,
-        addressfield: 'L',
-        print_date: 1,
-        print_endorsement: 1,
-        endorsement1: 'endors',
-        endorsement2: 'endors',
-        advert: '02042a3d422a7b9884329e0df9000000006a0000000000000000000000b93c00000000000000002102220100000000000000000000000000002c00000039004d00ffffffffffffffff0b0057657262756e672d3034001200f3fb07f3f12a03f6f3fbfff3fbfff3fb16f502072a3d422a7b9884c6a899bb00000000120000000000000000000000'
-      }
+        message = {
+          job_id: 1,
+          weight_mode: 3,
+          customerNumber: '69000|0',
+          kundennummer: '69000',
+          kostenstelle: 0,
+          waregroup: 'Standardsendungen',
+          label_offset: 0,
+          date_offset: 0,
+          stamp: 1,
+          addressfield: 'L',
+          print_date: 1,
+          print_endorsement: 1,
+          endorsement1: 'endors',
+          endorsement2: 'endors',
+          advert: '02042a3d422a7b9884329e0df9000000006a0000000000000000000000b93c00000000000000002102220100000000000000000000000000002c00000039004d00ffffffffffffffff0b0057657262756e672d3034001200f3fb07f3f12a03f6f3fbfff3fbfff3fb16f502072a3d422a7b9884c6a899bb00000000120000000000000000000000'
+        }
 
-      for k,v of message
-        if bodymessage.hasOwnProperty(k)
-          message[k]=bodymessage[k]
-      #message.advert="AgQqPUIqe5iEMp4N+QAAAABqAAAAAAAAAAAAAAC5PAAAAAAAAAAAIQIiAQAAAAAAAAAAAAAAAAAALAAAADkATQD//////////wsAV2VyYnVuZy0wNAASAPP7B/PxKgP28/v/8/v/8/sW9QIHKj1CKnuYhMaombsAAAAAEgAAAAAAAAAAAAAA"
-      me.lastStartJobMessage = message
-      errorFN = (errMessage) =>
-        console.log 'startJob','errorFN',errMessage
-        me.lastError = errMessage
-        res.send(JSON.stringify({success: false,msg: errMessage.code}))
-        me.getStatus()
+        for k,v of message
+          if bodymessage.hasOwnProperty(k)
+            message[k]=bodymessage[k]
+        #message.advert="AgQqPUIqe5iEMp4N+QAAAABqAAAAAAAAAAAAAAC5PAAAAAAAAAAAIQIiAQAAAAAAAAAAAAAAAAAALAAAADkATQD//////////wsAV2VyYnVuZy0wNAASAPP7B/PxKgP28/v/8/v/8/sW9QIHKj1CKnuYhMaombsAAAAAEgAAAAAAAAAAAAAA"
+        me.lastStartJobMessage = message
+        errorFN = (errMessage) =>
+          console.log 'startJob','errorFN',errMessage
+          me.lastError = errMessage
+          res.send(JSON.stringify({success: false,msg: errMessage.code}))
+          me.getStatus()
 
-      closeFN = (doneMessage) =>
-        me.currentJob message.job_id
-        console.log 'startJob','closeFN'
+        closeFN = (doneMessage) =>
+          me.currentJob message.job_id
+          console.log 'startJob','closeFN'
 
-      doneFN = (doneMessage) =>
-        console.log 'startJob','doneFN'
-        me.jobCount = 0
-        me.lastError=null
-        me.currentJob message.job_id
-        me.setCustomerFile message.customerNumber
-        res.send(JSON.stringify({success: true,msg: message}))
-        me.getStatus()
+        doneFN = (doneMessage) =>
+          console.log 'startJob','doneFN'
+          me.jobCount = 0
+          me.lastError=null
+          me.currentJob message.job_id
+          me.setCustomerFile message.customerNumber
+          res.send(JSON.stringify({success: true,msg: message}))
+          me.getStatus()
 
-      runSeq = (seq) ->
-        seq.init()
-        me.job_id = message.job_id
-        if typeof message.addressfield=='string'
-          me.addressfield = message.addressfield
-        seq.setJobId(message.job_id)
-        seq.setWeightMode(message.weight_mode)
-        me.customerNumber = message.customerNumber
-        seq.setCustomerNumber(message.customerNumber)
-        if message.waregroup?
-          me.waregroup = message.waregroup
-        seq.setPrintOffset(message.label_offset)
-        seq.setDateAhead(message.date_offset)
-        seq.setPrintDate(message.print_date)
-        seq.setPrintEndorsement(message.print_endorsement)
-        endorsement1 = ''
-        if message.endorsement1
-          endorsement1 = message.endorsement1
-        endorsement2 = ''
-        if message.endorsement2
-          endorsement2 = message.endorsement2
-        #adv = ''
-        #adv = '02042a3d422a7b9884329e0df9000000006a0000000000000000000000b93c00000000000000002102220100000000000000000000000000002c00000039004d00ffffffffffffffff0b0057657262756e672d3034001200f3fb07f3f12a03f6f3fbfff3fbfff3fb16f502072a3d422a7b9884c6a899bb00000000120000000000000000000000'
-        #if message.advert
-        #  if message.advert.length>30
-        #    adv = message.advert
-        seq.setEndorsementText1(endorsement1)
-        seq.setEndorsementText2(endorsement2)
-        #if adv.length>30
-        #  seq.setAdvertHex adv
+        runSeq = (seq) ->
+          seq.init()
+          me.job_id = message.job_id
+          if typeof message.addressfield=='string'
+            me.addressfield = message.addressfield
+          seq.setJobId(message.job_id)
+          seq.setWeightMode(message.weight_mode)
+          me.customerNumber = message.customerNumber
+          seq.setCustomerNumber(message.customerNumber)
+          if message.waregroup?
+            me.waregroup = message.waregroup
+          seq.setPrintOffset(message.label_offset)
+          seq.setDateAhead(message.date_offset)
+          seq.setPrintDate(message.print_date)
+          seq.setPrintEndorsement(message.print_endorsement)
+          endorsement1 = ''
+          if message.endorsement1
+            endorsement1 = message.endorsement1
+          endorsement2 = ''
+          if message.endorsement2
+            endorsement2 = message.endorsement2
+          #adv = ''
+          #adv = '02042a3d422a7b9884329e0df9000000006a0000000000000000000000b93c00000000000000002102220100000000000000000000000000002c00000039004d00ffffffffffffffff0b0057657262756e672d3034001200f3fb07f3f12a03f6f3fbfff3fbfff3fb16f502072a3d422a7b9884c6a899bb00000000120000000000000000000000'
+          #if message.advert
+          #  if message.advert.length>30
+          #    adv = message.advert
+          seq.setEndorsementText1(endorsement1)
+          seq.setEndorsementText2(endorsement2)
+          #if adv.length>30
+          #  seq.setAdvertHex adv
 
-        seq.setImprintChannelPort(me.imprint.getPort())
-        seq.setImprintChannelIP(me.imprint.getIP())
+          seq.setImprintChannelPort(me.imprint.getPort())
+          seq.setImprintChannelIP(me.imprint.getIP())
 
-      @controller 'getStartPrintjob',closeFN,doneFN,errorFN, runSeq
+        @controller 'getStartPrintjob',closeFN,doneFN,errorFN, runSeq
     catch e
       res.send(JSON.stringify({success: false,msg: e.message}))
 
