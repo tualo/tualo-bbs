@@ -31,7 +31,8 @@ class Status extends Command
   onCtrlClosed: () ->
     console.log 'onCtrlClosed','removeAllListeners'
     @ctrl.removeAllListeners()
-    process.exit()
+    delete @ctrl
+#    process.exit()
 
   onReady: () ->
     console.log 'onReady'

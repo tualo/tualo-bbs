@@ -31,7 +31,13 @@ class Stop extends Command
     @ctrl = new Controller
     @ctrl.setIP @args.ip
     @ctrl.on 'ready', ()=>@onReady()
+    @ctrl.on 'closed', ()=>@onCtrlClosed()
     @ctrl.open()
+    
+  onCtrlClosed: () ->
+    console.log 'onCtrlClosed','removeAllListeners'
+    @ctrl.removeAllListeners()
+    process.exit()
 
   onReady: () ->
     seq = @ctrl.getStopPrintjob()
