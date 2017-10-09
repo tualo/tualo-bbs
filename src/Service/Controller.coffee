@@ -3,6 +3,7 @@
 
 Net = require 'net'
 StatusLight = require '../Sequence/StatusLight'
+Status = require '../Sequence/Status'
 StartPrintjob = require '../Sequence/StartPrintjob'
 StopPrintjob = require '../Sequence/StopPrintjob'
 
@@ -83,6 +84,14 @@ class Controller extends EventEmitter
   onStatusLight: (message) ->
     @resetTimeoutTimer()
     @emit 'statusLight', message
+
+  getStatus: () ->
+    seq = new Status @client
+    seq.on 'close', (message) => @onStatus(message)
+    seq
+  onStatus: (message) ->
+    @resetTimeoutTimer()
+    @emit 'status', message
 
   getStartPrintjob: () ->
     seq = new StartPrintjob @client

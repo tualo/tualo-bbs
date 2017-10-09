@@ -28,7 +28,8 @@ class MSG2DCNAK extends Message
     console.warn "Error Service: ", (@serviceID.toString(16))
     console.warn "Error Code: ", (@errorCode.toString(16))
     console.warn "Error addLength: ", (@addLength)
-    console.warn "Error DATA: ", (data.slice(6))
+    console.warn "Error DATA: ", (data)
+
     if (@errorCode==0)
       console.warn "unkown error"
     else if (@errorCode==1)
