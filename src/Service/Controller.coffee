@@ -114,7 +114,7 @@ class Controller extends EventEmitter
     console.log 'onEnd'
     if typeof @client!='undefined' and @client != null
       @client.destroy()
-      console.log 'onEnd', client
+      console.log 'onEnd', @client
       @client=null
 
   onClose: () ->
