@@ -62,7 +62,7 @@ class Controller extends EventEmitter
       @client.setTimeout 2000
       @client.on 'timeout', (err) ->
         console.log 'controller socket timeout'
-        me.emit 'error', 'socket timeout'
+        me.emit 'error', {msg:'socket timeout',code:'socket timeout'}
         me.onEnd()
       @client.on 'error', (err) ->
         console.trace err
