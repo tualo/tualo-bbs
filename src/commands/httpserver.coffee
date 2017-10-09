@@ -249,7 +249,7 @@ class HttpServer extends Command
         bodymessage = JSON.parse(req.body.message)
       catch e
         console.log e
-        
+
       message = {
         job_id: 1,
         weight_mode: 3,
@@ -382,13 +382,14 @@ class HttpServer extends Command
   getStatusTimed: () ->
     me = @
     errorFN = (errMessage) =>
-      console.log 'getStatus (timed)','onError',errMessage
+      console.log 'getStatus (timed)','onError', 'next ping in 30s',errMessage
       me.lastError = errMessage
+      setTimeout me.getStatusTimed.bind(me), 30000
     closeFN = (message) =>
       console.log 'getStatus (timed)','closeFN'
-      setTimeout me.getStatusTimed.bind(me), 1000
     doneFN = (message) =>
-      console.log 'getStatus (timed)','doneFN'
+      console.log 'getStatus (timed)','doneFN', 'next ping in 5s'
       me.lastError=null
       me.lastState = message
+      setTimeout me.getStatusTimed.bind(me), 5000
     @controller 'getStatusLight',closeFN,doneFN,errorFN,null
