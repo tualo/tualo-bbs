@@ -5,6 +5,7 @@ class MSG2CURETURNSTATUSLIGHT extends Message
 
   constructor: () ->
     @available_scale = 0
+    @available_scale_text = 'unkown'
     @system_uid = 0
     @print_job_active = 0
     @print_job_id = 0
@@ -13,7 +14,17 @@ class MSG2CURETURNSTATUSLIGHT extends Message
     @setMessageType Message.TYPE_BBS_RETURN_STATUS_LIGHT
 
   setAvailableScale: (val) ->
+    
     @available_scale = val
+    if @available_scale == 0
+      @available_scale_text = '0: No scale'
+    if @available_scale == 1
+      @available_scale_text = '1: Static scale'
+    if @available_scale == 2
+      @available_scale_text = '2: Dynamic scale'
+    if @available_scale == 3
+      @available_scale_text = '3: Static and dynamic scale'
+
 
   setSystemUID: (val) ->
     @system_uid = val
