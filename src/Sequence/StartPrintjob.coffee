@@ -95,6 +95,7 @@ class StartPrintjob extends Sequence
     else if message.type_of_message == Message.TYPE_ACK
       console.log 'StartPrintjob', 'TYPE_ACK', message
       console.log 'TYPE_ACK'
+      @once 'message', (message) => @onCloseService(message)
       @sendCloseService()
     else
       console.log 'StartPrintjob', 'something went wrong', message.type_of_message

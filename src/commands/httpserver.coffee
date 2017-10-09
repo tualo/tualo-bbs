@@ -392,12 +392,12 @@ class HttpServer extends Command
     errorFN = (errMessage) =>
       console.log 'getStatus (timed)','onError', 'next ping in 30s',errMessage
       me.lastError = errMessage
-      setTimeout me.getStatusTimed.bind(me), 30000
+      #setTimeout me.getStatusTimed.bind(me), 30000
     closeFN = (message) =>
       console.log 'getStatus (timed)','closeFN'
     doneFN = (message) =>
       console.log 'getStatus (timed)','doneFN', 'next ping in 5s'
       me.lastError=null
       me.lastState = message
-      setTimeout me.getStatusTimed.bind(me), 5000
+      #setTimeout me.getStatusTimed.bind(me), 5000
     @controller 'getStatusLight',closeFN,doneFN,errorFN,null
