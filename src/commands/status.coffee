@@ -25,7 +25,11 @@ class Status extends Command
       @ctrl.setPort 4444
       @ctrl.setIP args.ip
       @ctrl.on 'ready', ()=>@onReady()
+      @ctrl.on 'closed', ()=>@onCtrlClosed()
       @ctrl.open()
+
+  onCtrlClosed: () ->
+    @ctrl.removeAllListeners()
 
   onReady: () ->
     console.log 'onReady'
