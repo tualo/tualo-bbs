@@ -212,15 +212,15 @@ class HttpServer extends Command
   expressStatus: (req, res) ->
     me = @
     errorFN = (errMessage) =>
-      console.log 'getStatus','errorFN',errMessage
+      console.log 'expressStatus','errorFN',errMessage
       me.lastError = errMessage
       res.send(JSON.stringify({success: false,msg: errMessage.code}))
     closeFN = (message) ->
-      console.log 'getStatus','closeFN'
+      console.log 'expressStatus','closeFN'
       #res.send(JSON.stringify(message))
     doneFN = (message) ->
       me.lastError=null
-      console.log 'getStatus','doneFN'
+      console.log 'expressStatus','doneFN'
       res.send(JSON.stringify({success: true,msg: message}))
     @controller 'getStatusLight',closeFN,doneFN,errorFN
 
@@ -231,6 +231,7 @@ class HttpServer extends Command
       console.log 'stopJob','errorFN',errMessage
       me.lastError = errMessage
       res.send(JSON.stringify({success: false,msg: errMessage.code}))
+      me.getStatus()
     closeFN = (message) =>
       console.log 'stopJob','closeFN'
     doneFN = (message) =>
@@ -239,6 +240,7 @@ class HttpServer extends Command
       me.lastError=null
       console.log 'stopJob','doneFN'
       res.send(JSON.stringify({success: true,msg: message}))
+      me.getStatus()
     @controller 'getStopPrintjob',closeFN,doneFN,errorFN
 
   expressStartJob: (req, res) ->
@@ -276,12 +278,13 @@ class HttpServer extends Command
       for k,v of message
         if bodymessage.hasOwnProperty(k)
           message[k]=bodymessage[k]
-      message.advert="AgQqPUIqe5iEMp4N+QAAAABqAAAAAAAAAAAAAAC5PAAAAAAAAAAAIQIiAQAAAAAAAAAAAAAAAAAALAAAADkATQD//////////wsAV2VyYnVuZy0wNAASAPP7B/PxKgP28/v/8/v/8/sW9QIHKj1CKnuYhMaombsAAAAAEgAAAAAAAAAAAAAA"
+      #message.advert="AgQqPUIqe5iEMp4N+QAAAABqAAAAAAAAAAAAAAC5PAAAAAAAAAAAIQIiAQAAAAAAAAAAAAAAAAAALAAAADkATQD//////////wsAV2VyYnVuZy0wNAASAPP7B/PxKgP28/v/8/v/8/sW9QIHKj1CKnuYhMaombsAAAAAEgAAAAAAAAAAAAAA"
       me.lastStartJobMessage = message
       errorFN = (errMessage) =>
         console.log 'startJob','errorFN',errMessage
         me.lastError = errMessage
         res.send(JSON.stringify({success: false,msg: errMessage.code}))
+        me.getStatus()
 
       closeFN = (doneMessage) =>
         me.currentJob message.job_id
@@ -294,6 +297,7 @@ class HttpServer extends Command
         me.currentJob message.job_id
         me.setCustomerFile message.customerNumber
         res.send(JSON.stringify({success: true,msg: message}))
+        me.getStatus()
 
       runSeq = (seq) ->
         seq.init()
@@ -392,17 +396,22 @@ class HttpServer extends Command
         seq.run()
       ctrl.open()
 
+  getStatus: () ->
+    if @timer
+      clearTimeout @timer
+    @getStatusTimed()
+
   getStatusTimed: () ->
     me = @
     errorFN = (errMessage) =>
       console.log 'getStatus (timed)','onError', 'next ping in 30s',errMessage
       me.lastError = errMessage
-      setTimeout me.getStatusTimed.bind(me), 30000
+      me.timer = setTimeout me.getStatusTimed.bind(me), 30000
     closeFN = (message) =>
       console.log 'getStatus (timed)','closeFN'
     doneFN = (message) =>
       console.log 'getStatus (timed)','doneFN', 'next ping in 5s'
       me.lastError=null
       me.lastState = message
-      setTimeout me.getStatusTimed.bind(me), 5000
+      me.timer = setTimeout me.getStatusTimed.bind(me), 5000
     @controller 'getStatusLight',closeFN,doneFN,errorFN,null
