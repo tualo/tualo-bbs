@@ -249,18 +249,9 @@ class HttpServer extends Command
         bodymessage = JSON.parse(req.body.message)
         console.log '########################'
         console.log '########################'
-        console.log '########################'
-        console.log '########################'
-        console.log '########################'
-        console.log '########################'
         console.log bodymessage
         console.log '########################'
         console.log '########################'
-        console.log '########################'
-        console.log '########################'
-        console.log '########################'
-        console.log '########################'
-        process.exit()
       catch e
         console.log e
 
