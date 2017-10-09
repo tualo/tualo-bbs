@@ -29,6 +29,7 @@ class Status extends Command
       @ctrl.open()
 
   onCtrlClosed: () ->
+    console.log 'onCtrlClosed','removeAllListeners'
     @ctrl.removeAllListeners()
 
   onReady: () ->
