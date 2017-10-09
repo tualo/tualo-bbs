@@ -70,7 +70,7 @@ class Controller extends EventEmitter
 
   onConnect: () ->
     console.log 'onConnect'
-    @resetTimeoutTimer()
+    #@resetTimeoutTimer()
     @client.setNoDelay true
     @client.on 'close', () => @onClose()
     @client.on 'end', () => @onEnd()
@@ -82,7 +82,7 @@ class Controller extends EventEmitter
     seq.on 'close', (message) => @onStatusLight(message)
     seq
   onStatusLight: (message) ->
-    @resetTimeoutTimer()
+    #@resetTimeoutTimer()
     @emit 'statusLight', message
 
   getStatus: () ->
@@ -90,7 +90,7 @@ class Controller extends EventEmitter
     seq.on 'close', (message) => @onStatus(message)
     seq
   onStatus: (message) ->
-    @resetTimeoutTimer()
+    #@resetTimeoutTimer()
     @emit 'status', message
 
   getStartPrintjob: () ->
@@ -98,7 +98,7 @@ class Controller extends EventEmitter
     seq.on 'close', (message) => @onStartPrintjob(message)
     seq
   onStartPrintjob: (message) ->
-    @resetTimeoutTimer()
+    #@resetTimeoutTimer()
     @emit 'startPrintJob', message
 
   getStopPrintjob: () ->
@@ -106,17 +106,19 @@ class Controller extends EventEmitter
     seq.on 'close', (message) => @onStopPrintjob(message)
     seq
   onStopPrintjob: (message) ->
-    @resetTimeoutTimer()
+    #@resetTimeoutTimer()
     @emit 'stopPrintJob', message
 
   onEnd: () ->
     #@emit "end"
     console.log 'onEnd'
-    @client.close()
-    #@client=null
+    if typeof @client!='undefined' and @client != null
+      @client.destroy()
+      console.log 'onEnd', client
+      @client=null
 
   onClose: () ->
-    @stopTimeoutTimer()
+    #@stopTimeoutTimer()
     @emit "closed",@client.closeEventName
     @client=null
 
