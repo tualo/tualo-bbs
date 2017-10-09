@@ -60,12 +60,16 @@ class Controller extends EventEmitter
       @client = Net.createConnection @port, @ip, () => @onConnect()
       @closeEventName = 'unexpected_closed'
       @client.setTimeout 2000
+      @client.on 'timeout', (err) ->
+        console.log 'controller socket timeout'
+        me.emit 'error', 'socket timeout'
+        me.onEnd()
       @client.on 'error', (err) ->
         console.trace err
         me.emit 'error', err
-        me.close()
+        me.onEnd()
       @client.on 'close', () ->
-        console.log 'controller close',me.closeEventName
+        #console.log 'controller close',me.closeEventName
         me.emit 'closed',me.closeEventName
       @client.on 'end', () ->
         console.log 'controller end'
