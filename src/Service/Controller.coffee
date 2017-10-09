@@ -82,11 +82,12 @@ class Controller extends EventEmitter
     @emit 'ready'
 
   getStatusLight: () ->
-    seq = new StatusLight @client
-    seq.on 'close', (message) => @onStatusLight(message)
-    seq
+    @seq = new StatusLight @client
+    @seq.on 'close', (message) => @onStatusLight(message)
+    @seq
   onStatusLight: (message) ->
     #@resetTimeoutTimer()
+    @seq.removeAllListeners()
     @emit 'statusLight', message
 
   getStatus: () ->
@@ -119,7 +120,6 @@ class Controller extends EventEmitter
     if typeof @client!='undefined' and @client != null
       @lasteventname = @client.closeEventName
       @client.destroy()
-      console.log 'onEnd', @client
       @client=null
 
   onClose: () ->
