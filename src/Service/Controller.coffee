@@ -16,7 +16,7 @@ class Controller extends EventEmitter
     @port = 4444 # fixed
     @client = null
     @closingService = false
-    console.log @
+    #console.log @
 
   setPort: (val) ->
     @port = val
@@ -27,12 +27,14 @@ class Controller extends EventEmitter
       @port = port
 
   resetPingTimer: () ->
-    @stopPingTimer()
-    @ping_timer = setTimeout @ping.bind(@), @ping_timeout
+    null
+    #@stopPingTimer()
+    #@ping_timer = setTimeout @ping.bind(@), @ping_timeout
   stopPingTimer: () ->
-    if @ping_timer
-      clearTimeout @ping_timer
-    @ping_timer = setTimeout @ping.bind(@), @ping_timeout
+    null
+    #if @ping_timer
+    #  clearTimeout @ping_timer
+    #@ping_timer = setTimeout @ping.bind(@), @ping_timeout
 
   ping: () ->
     null
@@ -40,14 +42,16 @@ class Controller extends EventEmitter
     #  @getStatusLight()
 
   resetTimeoutTimer: () ->
-    @resetPingTimer()
-    @stopTimeoutTimer()
-    @timeout_timer = setTimeout @close.bind(@), @timeout
+    null
+    #@resetPingTimer()
+    #@stopTimeoutTimer()
+    #@timeout_timer = setTimeout @close.bind(@), @timeout
 
   stopTimeoutTimer: () ->
-    if @timeout_timer
-      clearTimeout @timeout_timer
-    @timeout_timer = setTimeout @close.bind(@), @timeout
+    null
+    #if @timeout_timer
+    #  clearTimeout @timeout_timer
+    #@timeout_timer = setTimeout @close.bind(@), @timeout
 
   open: () ->
     me = @
