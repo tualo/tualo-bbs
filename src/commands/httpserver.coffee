@@ -370,8 +370,7 @@ class HttpServer extends Command
     args = @args
     if me.queryIsRunning
       deferFN = () ->
-        me.controller(sequenceFN,onClosed,onDone,onError,runseq).bind(me)
-
+        me.controller.apply(me,[sequenceFN,onClosed,onDone,onError,runseq])
       setTimeout deferFN,1500
     else
       me.queryIsRunning = true
