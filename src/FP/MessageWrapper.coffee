@@ -54,11 +54,13 @@ class MessageWrapper
           else
             return -1
 
-      console.log 'message_type',message_type
-      console.log 'message_interface',message_interface
+      if process.env.DEBUG_BBS_MSG=='1'
+        console.log 'message_type',message_type
+        console.log 'message_interface',message_interface
       if message_type == 65535
-        console.log "MSG>>>",data.slice(18).toString('ascii')
-        console.log "<<<MSG"
+        if process.env.DEBUG_BBS_MSG=='1'
+          console.log "MSG>>>",data.slice(18).toString('ascii')
+          console.log "<<<MSG"
 
       if message_type == Message.TYPE_ACK
         if message_interface==0
@@ -86,7 +88,7 @@ class MessageWrapper
 
       if message_type == Message.TYPE_BBS_START_PRINTJOB
         msg = new MSG2CUSTARTPRINTJOB
-        
+
 
       if message_type == Message.TYPE_BBS_STOP_PRINTJOB
         msg = new MSG2CUSTOPPRINTJOB
@@ -106,7 +108,8 @@ class MessageWrapper
 
       if msg == null
         msg = new MSG2DCNAK()
-        console.error('unknown message type '+message_type.toString(16))
+        if process.env.DEBUG_BBS_MSG=='1'
+          console.error('unknown message type '+message_type.toString(16))
 
       msg.setMessageType message_type
       msg.setMessageInterface message_interface

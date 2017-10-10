@@ -28,7 +28,7 @@ class Sequence extends EventEmitter
     @emit 'unexpected', message
 
   onData: (data) ->
-    if process.env.DEBUG_BBS=='1'
+    if process.env.DEBUG_BBS_SEQUENCE=='1'
       console.log '##############################'
       console.log '<<<<','Sequence','onData',data
       console.log '##############################'

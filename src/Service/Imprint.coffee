@@ -30,9 +30,11 @@ class Imprint extends EventEmitter
         if ('IPv4' != iface.family or iface.internal != false)
           return
         if (alias >= 1)
-          console.log(ifname + ':' + alias, iface.address)
+          if process.env.DEBUG_BBS_IMPRINT=='1'
+            console.log(ifname + ':' + alias, iface.address)
         else
-          console.log(ifname, iface.address)
+          if process.env.DEBUG_BBS_IMPRINT=='1'
+            console.log(ifname, iface.address)
         p = iface.address.split '.'
         if m_ip[0]==p[0] and m_ip[1]==p[1] and m_ip[2]==p[2]
           res=iface.address
@@ -70,16 +72,23 @@ class Imprint extends EventEmitter
   onServerError: (err) ->
     console.error err
 
+  debugConnections: () ->
+    @server.getConnections (err,count) ->
+      console.log 'IMPRINT SERVER', 'count connections', err, count
+
   onServerBound: () ->
     @address = @server.address()
 
     @port = @address.port
     @ip = @address.address
 
+    setInterval @debugConnections.bind(@),3000
 
-    console.log @address
+    if process.env.DEBUG_BBS_IMPRINT=='1'
+      console.log @address
     @resetTimeoutTimer()
-    console.log 'imprint','server created'
+    if process.env.DEBUG_BBS_IMPRINT=='1'
+      console.log 'imprint','server created'
     @emit "open"
 
   onClientConnect: (client) ->
@@ -94,24 +103,29 @@ class Imprint extends EventEmitter
     #  console.error 'onClientConnect','there is a client allready'
 
   onClientEnd: (data) ->
+    #if process.env.DEBUG_BBS_IMPRINT=='1'
     console.log 'imprint client end'
     @onClientData data
 
   onClientData: (data) ->
     if data
       @resetTimeoutTimer()
-      console.log 'imprint client data < ',data.toString('hex')
+      if process.env.DEBUG_BBS_IMPRINT=='1'
+        console.log 'imprint client data < ',data.toString('hex')
       message = MessageWrapper.getMessageObject data
-      console.log 'imprint message', message
+      if process.env.DEBUG_BBS_IMPRINT=='1'
+        console.log 'imprint message', message
       if message.type_of_message ==  Message.TYPE_BBS_NEXT_IMPRINT
         @emit 'imprint', message
         ack = new MSG2DCACK
         ack.setApplictiondata()
         sendbuffer = ack.toFullByteArray()
         @client.write sendbuffer
-        console.log '>>>SEND ACK',sendbuffer
+        if process.env.DEBUG_BBS_IMPRINT=='1'
+          console.log '>>>SEND ACK',sendbuffer
       else if message.type_of_message == Message.SERVICE_NEXT_IMPRINT
-        console.log 'imprint','SERVICE_NEXT_IMPRINT'
+        if process.env.DEBUG_BBS_IMPRINT=='1'
+          console.log 'imprint','SERVICE_NEXT_IMPRINT'
         @emit 'acting'
         ack = new MSG2DCACK
         ack.setServiceID Message.SERVICE_NEXT_IMPRINT
@@ -119,7 +133,8 @@ class Imprint extends EventEmitter
         @client.write ack.toFullByteArray()
 
       else if message.type_of_message == Message.TYPE_OPEN_SERVICE
-        console.log 'imprint','TYPE_OPEN_SERVICE'
+        if process.env.DEBUG_BBS_IMPRINT=='1'
+          console.log 'imprint','TYPE_OPEN_SERVICE'
         @emit 'acting'
         ack = new MSG2DCACK
         ack.setServiceID Message.SERVICE_NEXT_IMPRINT
@@ -146,23 +161,44 @@ class Imprint extends EventEmitter
         #@client.write ack.app_data
 
       else
-        console.log 'message', 'not expected imprint messages'
+        if process.env.DEBUG_BBS_IMPRINT=='1'
+          console.log 'message', 'not expected imprint messages'
 
   onClientClose: () ->
-    @client = null
+    #@client = null
+    if @client.destroyed==false
+      @client.destroy()
+    #if process.env.DEBUG_BBS_IMPRINT=='1'
     console.error 'onClientClose()'
 
   onClientError: (err) ->
-    console.error 'client error', err
+    if @client.destroyed==false
+      @client.destroy()
+    if process.env.DEBUG_BBS_IMPRINT=='1'
+      console.error 'client error', err
+
+      
+  closeClient: () ->
+    if @client?#!=null
+      if @client.destroyed==false
+        @client.end()
+    if @client?  and @client.destroyed==false
+      if process.env.DEBUG_BBS_IMPRINT=='1'
+        console.log 'closeClient','open'
+    else
+      if process.env.DEBUG_BBS_IMPRINT=='1'
+        console.log 'closeClient','not open'
 
   close: () ->
     if @client?#!=null
       @client.end()
 
-    console.error 'close()'
+    if process.env.DEBUG_BBS_IMPRINT=='1'
+      console.error 'server ------>   close()'
     @server.close()
 
   onServerClose: () ->
-    console.error 'onServerClose'
+    if process.env.DEBUG_BBS_IMPRINT=='1'
+      console.error 'onServerClose'
     @stopTimeoutTimer()
     @emit "closed"

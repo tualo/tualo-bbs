@@ -61,7 +61,8 @@ class Controller extends EventEmitter
       @closeEventName = 'unexpected_closed'
       @client.setTimeout 2000
       @client.on 'timeout', (err) ->
-        console.log 'controller socket timeout'
+        if process.env.DEBUG_BBS_CONTROLLER=='1'
+          console.log 'controller socket timeout'
         me.emit 'error', {msg:'socket timeout',code:'ETIMEDOUT',address:me.ip}
         me.onEnd()
       @client.on 'error', (err) ->
@@ -72,12 +73,15 @@ class Controller extends EventEmitter
         #console.log 'controller close',me.closeEventName
         me.emit 'closed',me.closeEventName
       @client.on 'end', () ->
-        console.log 'controller end'
+        if process.env.DEBUG_BBS_CONTROLLER=='1'
+          console.log 'controller end'
         me.emit 'ended'
-      console.log '-----'
+      if process.env.DEBUG_BBS_CONTROLLER=='1'
+        console.log '-----'
 
   onConnect: () ->
-    console.log 'onConnect'
+    if process.env.DEBUG_BBS_CONTROLLER=='1'
+      console.log 'onConnect'
     #@resetTimeoutTimer()
     @client.setNoDelay true
     @client.on 'close', () => @onClose()
@@ -120,7 +124,8 @@ class Controller extends EventEmitter
 
   onEnd: () ->
     #@emit "end"
-    console.log 'onEnd'
+    if process.env.DEBUG_BBS_CONTROLLER=='1'
+      console.log 'onEnd'
     if typeof @client!='undefined' and @client != null
       @lasteventname = @client.closeEventName
       @client.destroy()

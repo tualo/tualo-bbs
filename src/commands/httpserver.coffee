@@ -31,7 +31,8 @@ class HttpServer extends Command
       me.waregroup = 'Standardsendungen'
 
       me.jobfile = args.jobfile||'/opt/grab/job.txt'
-      console.log @args
+      if process.env.DEBUG_BBS_HTTPSERVER=='1'
+        console.log @args
       opts =
         host     : @args.hostsystem
         user     : @args.dbuser
@@ -67,7 +68,8 @@ class HttpServer extends Command
       me.imprint.on 'imprint', me.onImprint.bind(me)
       me.imprint.open()
     else
-      console.log 'does not use a machine'
+      if process.env.DEBUG_BBS_HTTPSERVER=='1'
+        console.log 'does not use a machine'
 
     @openExpressServer()
 
@@ -145,40 +147,51 @@ class HttpServer extends Command
     fn = (err, connection) ->
       me.lastSQLError=null
       if err
-        console.log 'ERROR on MYSQL Connection'
+        if process.env.DEBUG_BBS_HTTPSERVER=='1'
+          console.log 'ERROR on MYSQL Connection'
         console.trace err
         me.lastSQLError = err.message
         errorFN = (errMessage) =>
-          console.log 'stopJob','errorFN',errMessage
+          if process.env.DEBUG_BBS_HTTPSERVER=='1'
+            console.log 'stopJob','errorFN',errMessage
         closeFN = (message) =>
           me.currentJob ''
-          console.log 'stopJob','closeFN', 'on MYSQL Connection'
+          if process.env.DEBUG_BBS_HTTPSERVER=='1'
+            console.log 'stopJob','closeFN', 'on MYSQL Connection'
         doneFN = (message) =>
           me.currentJob ''
-          console.log 'stopJob','doneFN', 'on MYSQL Connection'
+          if process.env.DEBUG_BBS_HTTPSERVER=='1'
+            console.log 'stopJob','doneFN', 'on MYSQL Connection'
         me.controller 'getStopPrintjob',closeFN,doneFN,errorFN
       else
-        console.log 'write db'
+        if process.env.DEBUG_BBS_HTTPSERVER=='1'
+          console.log 'write db'
         connection.query sql, (err, rows, fields) ->
           me.lastSQLError=null
-          console.log 'write db returned'
+          if process.env.DEBUG_BBS_HTTPSERVER=='1'
+            console.log 'write db returned'
           if err
             me.lastSQLError = err.message
-            console.trace err
+            if process.env.DEBUG_BBS_HTTPSERVER=='1'
+              console.trace err
             if err.code!='ER_DUP_KEY'
               errorFN = (errMessage) =>
-                console.log 'stopJob','errorFN',errMessage
+                if process.env.DEBUG_BBS_HTTPSERVER=='1'
+                  console.log 'stopJob','errorFN',errMessage
               closeFN = (message) =>
                 me.currentJob ''
-                console.log 'stopJob','closeFN', 'db write error'
+                if process.env.DEBUG_BBS_HTTPSERVER=='1'
+                  console.log 'stopJob','closeFN', 'db write error'
               doneFN = (message) =>
                 me.currentJob ''
-                console.log 'stopJob','doneFN', 'db write error'
+                if process.env.DEBUG_BBS_HTTPSERVER=='1'
+                  console.log 'stopJob','doneFN', 'db write error'
               me.controller 'getStopPrintjob',closeFN,doneFN,errorFN
           connection.release()
 
     me.pool.getConnection fn
-    console.log 'imprint--------------',imprint
+    if process.env.DEBUG_BBS_HTTPSERVER=='1'
+      console.log 'imprint--------------',imprint
 
   openExpressServer: () ->
     @getStatusTimed()
@@ -212,15 +225,18 @@ class HttpServer extends Command
   expressStatus: (req, res) ->
     me = @
     errorFN = (errMessage) =>
-      console.log 'expressStatus','errorFN',errMessage
+      if process.env.DEBUG_BBS_HTTPSERVER=='1'
+        console.log 'expressStatus','errorFN',errMessage
       me.lastError = errMessage
       res.send(JSON.stringify({success: false,msg: errMessage.code}))
     closeFN = (message) ->
-      console.log 'expressStatus','closeFN'
+      if process.env.DEBUG_BBS_HTTPSERVER=='1'
+        console.log 'expressStatus','closeFN'
       #res.send(JSON.stringify(message))
     doneFN = (message) ->
       me.lastError=null
-      console.log 'expressStatus','doneFN'
+      if process.env.DEBUG_BBS_HTTPSERVER=='1'
+        console.log 'expressStatus','doneFN'
       res.send(JSON.stringify({success: true,msg: message}))
     @controller 'getStatusLight',closeFN,doneFN,errorFN
 
@@ -228,17 +244,20 @@ class HttpServer extends Command
     me = @
     message = {}
     errorFN = (errMessage) =>
-      console.log 'stopJob','errorFN',errMessage
+      if process.env.DEBUG_BBS_HTTPSERVER=='1'
+        console.log 'stopJob','errorFN',errMessage
       me.lastError = errMessage
       res.send(JSON.stringify({success: false,msg: errMessage.code}))
       me.getStatus()
     closeFN = (message) =>
-      console.log 'stopJob','closeFN'
+      if process.env.DEBUG_BBS_HTTPSERVER=='1'
+        console.log 'stopJob','closeFN'
     doneFN = (message) =>
       @currentJob ''
       @setCustomerFile ''
       me.lastError=null
-      console.log 'stopJob','doneFN'
+      if process.env.DEBUG_BBS_HTTPSERVER=='1'
+        console.log 'stopJob','doneFN'
       res.send(JSON.stringify({success: true,msg: message}))
       me.getStatus()
     @controller 'getStopPrintjob',closeFN,doneFN,errorFN
@@ -252,11 +271,12 @@ class HttpServer extends Command
         bodymessage = {}
         try
           bodymessage = JSON.parse(req.body.message)
-          console.log '########################'
-          console.log '########################'
-          console.log bodymessage
-          console.log '########################'
-          console.log '########################'
+          if process.env.DEBUG_BBS_HTTPSERVER=='1'
+            console.log '########################'
+            console.log '########################'
+            console.log bodymessage
+            console.log '########################'
+            console.log '########################'
         catch e
           console.log e
 
@@ -284,17 +304,20 @@ class HttpServer extends Command
         #message.advert="AgQqPUIqe5iEMp4N+QAAAABqAAAAAAAAAAAAAAC5PAAAAAAAAAAAIQIiAQAAAAAAAAAAAAAAAAAALAAAADkATQD//////////wsAV2VyYnVuZy0wNAASAPP7B/PxKgP28/v/8/v/8/sW9QIHKj1CKnuYhMaombsAAAAAEgAAAAAAAAAAAAAA"
         me.lastStartJobMessage = message
         errorFN = (errMessage) =>
-          console.log 'startJob','errorFN',errMessage
+          if process.env.DEBUG_BBS_HTTPSERVER=='1'
+            console.log 'startJob','errorFN',errMessage
           me.lastError = errMessage
           res.send(JSON.stringify({success: false,msg: errMessage.code}))
           me.getStatus()
 
         closeFN = (doneMessage) =>
           me.currentJob message.job_id
-          console.log 'startJob','closeFN'
+          if process.env.DEBUG_BBS_HTTPSERVER=='1'
+            console.log 'startJob','closeFN'
 
         doneFN = (doneMessage) =>
-          console.log 'startJob','doneFN'
+          if process.env.DEBUG_BBS_HTTPSERVER=='1'
+            console.log 'startJob','doneFN'
           me.jobCount = 0
           me.lastError=null
           me.currentJob message.job_id
@@ -343,7 +366,8 @@ class HttpServer extends Command
 
 
   currentJob: (job) ->
-    console.log('set job: ',job)
+    if process.env.DEBUG_BBS_HTTPSERVER=='1'
+      console.log('set job: ',job)
     fs.writeFile @jobfile, job, (err) ->
       if err
         throw err
@@ -359,9 +383,10 @@ class HttpServer extends Command
 
 
   onDBError: (err) ->
-    console.log '####################'
-    console.log 'onDBError'
-    console.trace err
+    if process.env.DEBUG_BBS_HTTPSERVER=='1'
+      console.log '####################'
+      console.log 'onDBError'
+      console.trace err
     setTimeout process.exit, 5000
 
 
@@ -384,7 +409,8 @@ class HttpServer extends Command
         if typeof onError=='function'
           onError msg
       ctrl.on 'closed',(msg) ->
-        console.log 'controller',sequenceFN,'ctrl close'
+        if process.env.DEBUG_BBS_HTTPSERVER=='1'
+          console.log 'controller',sequenceFN,'ctrl close'
         onClosed msg
       ctrl.on 'ready', () ->
         me.queryIsRunning = false
@@ -406,20 +432,27 @@ class HttpServer extends Command
   getStatusTimed: () ->
     me = @
     errorFN = (errMessage) =>
-      console.log 'getStatus (timed)','onError', 'next ping in 30s',errMessage
+      if process.env.DEBUG_BBS_HTTPSERVER=='1'
+        console.log 'getStatus (timed)','onError', 'next ping in 30s',errMessage
       me.lastError = errMessage
       if me.timer
         clearTimeout me.timer
       me.timer = setTimeout me.getStatusTimed.bind(me), 30000
     closeFN = (message) =>
-      console.log 'getStatus (timed)','closeFN'
+      if process.env.DEBUG_BBS_HTTPSERVER=='1'
+        console.log 'getStatus (timed)','closeFN'
       #if me.timer
       #  clearTimeout me.timer
       #me.timer = setTimeout me.getStatusTimed.bind(me), 5000
     doneFN = (message) =>
-      console.log 'getStatus (timed)','doneFN', 'next ping in 5s'
+      if process.env.DEBUG_BBS_HTTPSERVER=='1'
+        console.log 'getStatus (timed)','doneFN', 'next ping in 5s'
       me.lastError=null
       me.lastState = message
+      if message.print_job_active==0
+        # let's go, close the client there is no active job anymore
+        me.imprint.closeClient()
+
       if me.timer
         clearTimeout me.timer
       me.timer = setTimeout me.getStatusTimed.bind(me), 5000

@@ -110,21 +110,31 @@ class Sampleserver extends Command
   onServerClose: () ->
     console.log 'close'
 
+  debugConnections: () ->
+    @server.getConnections (err,count) ->
+      console.log 'SAMPLE SERVER', 'count connections', err, count
+
   onServerBound: () ->
     @address = @server.address()
-    console.log('server',@address)
+    #console.log('server',@address)
+    setInterval @debugConnections.bind(@),3000
+
     @resetTimeoutTimer()
 
   onClientConnect: (client) ->
     @client = client
     @client.on 'data', (data) => @onClientData(data)
-    @client.on 'end', (data) => @onClientData(data)
+    @client.on 'end', (data) => @onClientEnd(data)
     @client.on 'error', (err) => @onClientError(err)
     @client.on 'close', () => @onClientClose()
 
+  onClientEnd: (data) ->
+    @onClientData data
+    #@client.end()
+
   onClientData: (data) ->
     if data?
-      console.log '<<<', data
+      #console.log '<<<', data
       message = MessageWrapper.getMessageObject data
       if message==-1 or (message.type_of_message==4 and message.interface_of_message==5)
         data = data.slice 10
@@ -133,26 +143,26 @@ class Sampleserver extends Command
         else
           return
 
-      console.log '<message<', message
+      #console.log '<message<', message
 
       if message.interface_of_message == 0 and message.serviceID == 1000
-        console.log 'open print service'
+        #console.log 'open print service'
         response = new MSG2DCACK
         response.interface_of_message = message.interface_of_message
         response.setServiceID message.serviceID
         sendbuffer = response.toFullByteArray()
-        console.log '>>>', sendbuffer
+        #console.log '>>>', sendbuffer
         @client.write sendbuffer
 
 
       else if message.interface_of_message == 0 and message.type_of_message == 4098
 
-        console.log 'close service'
+        #console.log 'close service'
         response = new MSG2DCACK
         response.interface_of_message = message.interface_of_message
         response.setServiceID message.serviceID
         sendbuffer = response.toFullByteArray()
-        console.log '>>>', sendbuffer
+        #console.log '>>>', sendbuffer
         @client.write sendbuffer
 
 
@@ -160,24 +170,24 @@ class Sampleserver extends Command
 
 
         # open service
-        console.log 'open status service'
+        #console.log 'open status service'
         response = new MSG2DCACK
         response.interface_of_message = message.interface_of_message
         response.setServiceID message.serviceID
         sendbuffer = response.toFullByteArray()
-        console.log '>>>', sendbuffer
+        #console.log '>>>', sendbuffer
         @client.write sendbuffer
 
 
       else if message.interface_of_message == 9 and message.type_of_message == 4336
-        console.log 'start print job',message
+        #console.log 'start print job',message
         response = new MSG2DCACK
         response.interface_of_message =  0 #message.interface_of_message
         response.type_of_message = message.type_of_message
         response.setServiceID 1000
 
         sendbuffer = response.toFullByteArray()
-        console.log '>>> ***', sendbuffer
+        #console.log '>>> ***', sendbuffer
         @client.write sendbuffer
 
         @nextImprintMessage = message
@@ -189,17 +199,18 @@ class Sampleserver extends Command
         # 0008100200000000
 
       else if message.interface_of_message == 9 and message.type_of_message == 4337
-        console.log 'stop print job',message
+        #console.log 'stop print job',message
         response = new MSG2DCACK
         response.interface_of_message =  0 #message.interface_of_message
         response.setServiceID 1002
         sendbuffer = response.toFullByteArray()
         @isPrinting=0
-        console.log '>>> ***', sendbuffer
+        #console.log '>>> ***', sendbuffer
         @client.write sendbuffer
 
         @nextImprintMessage = null
-        @sendImprints()
+        #@client.end()
+        #@sendImprints()
 
 
       else if message.interface_of_message == 9 and message.type_of_message == 4339
@@ -217,19 +228,23 @@ class Sampleserver extends Command
 
         #response.setServiceID message.serviceID
         sendbuffer = response.toFullByteArray()
-        console.log '>*>*>', sendbuffer
+        #console.log '>*>*>', sendbuffer
         @client.write sendbuffer
 
       else
         console.log 'client data',message
 
   onClientClose: () ->
-    @client = null
+    #if @client.destroyed==false
+    #  @client.destroy()
 
   onClientError: (err) ->
-    console.error 'client error', err
+    #if @client.destroyed==false
+    #  @client.destroy()
+    #console.error 'client error', err
 
   close: () ->
-    if @client!=null
-      @client.close()
+    if @client.destroyed==false
+      @client.destroy()
+
     @server.close()

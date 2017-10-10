@@ -18,23 +18,27 @@ class Status extends Sequence
     @sendOpenService Message.SERVICE_STATUS
 
   onOpenService: (message) ->
-    console.log message
+    if process.env.DEBUG_BBS_STATU=='1'
+      console.log message
     if message.type_of_message == Message.TYPE_ACK and message.serviceID == Message.SERVICE_STATUS
       @once 'message', (message) => @onGetStatus(message)
-      console.log('sendBBSStatusLight')
+      if process.env.DEBUG_BBS_STATU=='1'
+        console.log('sendBBSStatusLight')
       @sendBBSStatus()
     #else
     #  @unexpected message
 
   onCloseService: (message) ->
-    console.log('onCloseService',message,Message.SERVICE_STATUS)
+    if process.env.DEBUG_BBS_STATU=='1'
+      console.log('onCloseService',message,Message.SERVICE_STATUS)
     #if message.type_of_message == Message.TYPE_ACK# and message.serviceID == Message.SERVICE_STATUS_LIGHT
     @end()
     #else
     #  @unexpected message
 
   onGetStatus: (message) ->
-    console.log('onGetStatus',message,Message.TYPE_BBS_GET_STATUS_RESPONSE)
+    if process.env.DEBUG_BBS_STATU=='1'
+      console.log('onGetStatus',message,Message.TYPE_BBS_GET_STATUS_RESPONSE)
     if message.type_of_message == Message.TYPE_BBS_GET_STATUS_RESPONSE
       @message = message
       @once 'message', (message) => @onCloseService(message)

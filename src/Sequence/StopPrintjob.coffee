@@ -19,7 +19,8 @@ class StopPrintjob extends Sequence
     @sendOpenService Message.SERVICE_BBS_PRINTJOB
 
   onOpenService: (message) ->
-    console.log 'MSG2CUSTOPPRINTJOB','onOpenService',message.type_of_message,message.serviceID
+    if process.env.DEBUG_BBS_STOPJOB=='1'
+      console.log 'MSG2CUSTOPPRINTJOB','onOpenService',message.type_of_message,message.serviceID
     if message.type_of_message == Message.TYPE_ACK and message.serviceID == Message.SERVICE_BBS_PRINTJOB
       @once 'message', (message) => @onStopPrintJob(message)
       @stopPrintJob()
@@ -27,14 +28,16 @@ class StopPrintjob extends Sequence
       @unexpected message
 
   onCloseService: (message) ->
-    console.log 'MSG2CUSTOPPRINTJOB','onCloseService',message.type_of_message
+    if process.env.DEBUG_BBS_STOPJOB=='1'
+      console.log 'MSG2CUSTOPPRINTJOB','onCloseService',message.type_of_message
     if message.type_of_message == Message.TYPE_ACK# and message.serviceID == Message.SERVICE_BBS_PRINTJOB
       @end()
     #else
     #  @unexpected message
 
   onStopPrintJob: (message) ->
-    console.log 'MSG2CUSTOPPRINTJOB','onStopPrintJob',message,'Message.TYPE_BBS_STOP_PRINTJOB',Message.TYPE_BBS_STOP_PRINTJOB
+    if process.env.DEBUG_BBS_STOPJOB=='1'
+      console.log 'MSG2CUSTOPPRINTJOB','onStopPrintJob',message,'Message.TYPE_BBS_STOP_PRINTJOB',Message.TYPE_BBS_STOP_PRINTJOB
     #if message.type_of_message == Message.TYPE_BBS_STOP_PRINTJOB
     @message = message
     @once 'message', (message) => @onCloseService(message)
@@ -43,7 +46,8 @@ class StopPrintjob extends Sequence
     #  @unexpected message
 
   stopPrintJob: () ->
-    console.log 'MSG2CUSTOPPRINTJOB','stopPrintJob'
+    if process.env.DEBUG_BBS_STOPJOB=='1'
+      console.log 'MSG2CUSTOPPRINTJOB','stopPrintJob'
     sendbuffer = @stop_message.toFullByteArray()
     sizemessage = new MSG2CUPREPARESIZE
     sizemessage.setSize sendbuffer.length

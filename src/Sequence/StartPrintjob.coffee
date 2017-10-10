@@ -55,63 +55,79 @@ class StartPrintjob extends Sequence
     @start_message.setImprintChannelPort parseInt(val)
 
   init: () ->
-    console.log 'StartPrintjob', 'init'
+    if process.env.DEBUG_BBS_STARTJOB=='1'
+      console.log 'StartPrintjob', 'init'
     @start_message = new MSG2CUSTARTPRINTJOB
   run: () ->
-    console.log 'StartPrintjob', 'run'
+    if process.env.DEBUG_BBS_STARTJOB=='1'
+      console.log 'StartPrintjob', 'run'
     @once 'message', (message) => @onOpenService(message)
     @sendOpenService Message.SERVICE_BBS_PRINTJOB
 
   onOpenService: (message) ->
-    console.log 'StartPrintjob', 'onOpenService',message
+    if process.env.DEBUG_BBS_STARTJOB=='1'
+      console.log 'StartPrintjob', 'onOpenService',message
     if message.type_of_message == Message.TYPE_ACK and message.serviceID == Message.SERVICE_BBS_PRINTJOB
-      console.log 'StartPrintjob', 'expected',message
+      if process.env.DEBUG_BBS_STARTJOB=='1'
+        console.log 'StartPrintjob', 'expected',message
       @once 'message', (message) => @onStartPrintJob(message)
       @startPrintJob()
     else
-      console.log 'StartPrintjob', 'unexpected', message
+      if process.env.DEBUG_BBS_STARTJOB=='1'
+        console.log 'StartPrintjob', 'unexpected', message
       @unexpected message
 
   onCloseService: (message) ->
-    console.log 'StartPrintjob', 'onCloseService', message
+    if process.env.DEBUG_BBS_STARTJOB=='1'
+      console.log 'StartPrintjob', 'onCloseService', message
     if message.type_of_message == Message.TYPE_ACK# and message.serviceID == Message.SERVICE_BBS_PRINTJOB
-      console.log 'StartPrintjob', 'expected', message
+      if process.env.DEBUG_BBS_STARTJOB=='1'
+        console.log 'StartPrintjob', 'expected', message
       @end()
     else
-      console.log 'StartPrintjob', 'unexpected', message
+      if process.env.DEBUG_BBS_STARTJOB=='1'
+        console.log 'StartPrintjob', 'unexpected', message
       @unexpected message
 
   onStartPrintJob: (message) ->
-    console.log 'StartPrintjob', 'onStartPrintJob', message
+    if process.env.DEBUG_BBS_STARTJOB=='1'
+      console.log 'StartPrintjob', 'onStartPrintJob', message
 
     if message.type_of_message == Message.TYPE_BBS_START_PRINTJOB
-      console.log 'StartPrintjob', 'TYPE_BBS_START_PRINTJOB', message
-      console.log 'TYPE_BBS_START_PRINTJOB'
+      if process.env.DEBUG_BBS_STARTJOB=='1'
+        console.log 'StartPrintjob', 'TYPE_BBS_START_PRINTJOB', message
+        console.log 'TYPE_BBS_START_PRINTJOB'
       @message = message
 
       @once 'message', (message) => @onCloseService(message)
       @sendCloseService()
-      console.log 'ok closing'
+      if process.env.DEBUG_BBS_STARTJOB=='1'
+        console.log 'ok closing'
     else if message.type_of_message == Message.TYPE_ACK
-      console.log 'StartPrintjob', 'TYPE_ACK', message
-      console.log 'TYPE_ACK'
+      if process.env.DEBUG_BBS_STARTJOB=='1'
+        console.log 'StartPrintjob', 'TYPE_ACK', message
+        console.log 'TYPE_ACK'
       @once 'message', (message) => @onCloseService(message)
       @sendCloseService()
     else
-      console.log 'StartPrintjob', 'something went wrong', message.type_of_message
+      if process.env.DEBUG_BBS_STARTJOB=='1'
+        console.log 'StartPrintjob', 'something went wrong', message.type_of_message
       @unexpected message
     #else
     #  @unexpected message
 
   startPrintJob: () ->
-    console.log "start message>",@start_message
+    if process.env.DEBUG_BBS_STARTJOB=='1'
+      console.log "start message>",@start_message
     sendbuffer = @start_message.toFullByteArray()
     sizemessage = new MSG2CUPREPARESIZE
     sizemessage.setSize sendbuffer.length
-    console.log "sizemessage> ", sizemessage.getBuffer().toString('hex')
+    if process.env.DEBUG_BBS_STARTJOB=='1'
+      console.log "sizemessage> ", sizemessage.getBuffer().toString('hex')
     @client.write sizemessage.getBuffer()
 
-    console.log "sendbuffer> ", sendbuffer.toString('hex')
-    console.log "image> ", @start_message.advert.toString('hex')
-    console.log "image> ", @start_message.advert.toString('base64')
+    if process.env.DEBUG_BBS_STARTJOB=='1'
+      console.log "sendbuffer> ", sendbuffer.toString('hex')
+      console.log "image> ", @start_message.advert.toString('hex')
+      console.log "image> ", @start_message.advert.toString('base64')
     @client.write sendbuffer

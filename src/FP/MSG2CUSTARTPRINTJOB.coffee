@@ -209,53 +209,75 @@ class MSG2CUSTARTPRINTJOB extends Message
     @app_data
   check: (buf) ->
     position = 0
-    console.log 'check id', buf.readUInt32BE position
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check id', buf.readUInt32BE position
     position+=4
-    console.log 'check custid', buf.readUInt32BE position
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check custid', buf.readUInt32BE position
     position+=4
-    console.log 'check printdate', buf.readUInt8 position
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check printdate', buf.readUInt8 position
     position+=1
-    console.log 'check date_ahead', buf.readUInt16BE position
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check date_ahead', buf.readUInt16BE position
     position+=2
-    console.log 'check weightmode', buf.readUInt8 position
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check weightmode', buf.readUInt8 position
     position+=1
-    console.log 'check offset', buf.readUInt32BE position
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check offset', buf.readUInt32BE position
     position+=4
-    console.log 'check imageid', buf.readUInt32BE position
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check imageid', buf.readUInt32BE position
     position+=4
-    console.log 'check print_endorsement', buf.readUInt8 position
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check print_endorsement', buf.readUInt8 position
     position+=1
-    console.log 'check endorsement_id', buf.readUInt32BE position
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check endorsement_id', buf.readUInt32BE position
     position+=4
-    console.log 'check endorsement length', length = buf.readUInt32BE position
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check endorsement length', length = buf.readUInt32BE position
     position+=4
-    console.log 'check endorsement 1:', buf.slice(position,position+length).toString('ascii')
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check endorsement 1:', buf.slice(position,position+length).toString('ascii')
     position+=length
-    console.log 'check endorsement length', length = buf.readUInt32BE position
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check endorsement length', length = buf.readUInt32BE position
     position+=4
-    console.log 'check endorsement 2:', buf.slice(position,position+length).toString('ascii')
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check endorsement 2:', buf.slice(position,position+length).toString('ascii')
     position+=length
-    console.log 'check advert length', length = buf.readUInt32BE position
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check advert length', length = buf.readUInt32BE position
     position+=4
-    console.log buf.slice(position,position+length).toString('hex')
-    position+=length
-
-    console.log 'check town_circle_id', buf.readUInt32BE position
-    position+=4
-    console.log 'check town_circle length', length = buf.readUInt32BE position
-    position+=4
-    console.log 'check town_circle 1:', buf.slice(position,position+length)#.toString('ascii')
-    position+=length
-
-    console.log 'check customer_number length', length = buf.readUInt32BE position
-    position+=4
-    console.log 'check customer_number:', buf.slice(position,position+length).toString('ascii')
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log buf.slice(position,position+length).toString('hex')
     position+=length
 
-    console.log 'check ip length', length = buf.readUInt32BE position
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check town_circle_id', buf.readUInt32BE position
     position+=4
-    console.log 'check ip:', buf.slice(position,position+length).toString('ascii')
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check town_circle length', length = buf.readUInt32BE position
+    position+=4
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check town_circle 1:', buf.slice(position,position+length)#.toString('ascii')
     position+=length
 
-    console.log 'check port length', length = buf.readUInt32BE position
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check customer_number length', length = buf.readUInt32BE position
+    position+=4
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check customer_number:', buf.slice(position,position+length).toString('ascii')
+    position+=length
+
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check ip length', length = buf.readUInt32BE position
+    position+=4
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check ip:', buf.slice(position,position+length).toString('ascii')
+    position+=length
+    if process.env.DEBUG_BBS_MSG=='1'
+      console.log 'check port length', length = buf.readUInt32BE position
     position+=4
