@@ -41,7 +41,7 @@ class InstallController extends Command
       [Install]
       WantedBy=multi-user.target
       """
-      servicefiledata = servicefiledata.replace '{cmd}', path.resolve(__dirname,'..','..','bin','bbs-server') + ' '+args.port + ' '+args.machine_ip + ' '+args.machine_port + ' '+args.hostsystem+ ' '+args.hostdb+ ' '+args.dbuser+ ' '+args.dbpass+ ' '+args.jobfile
+      servicefiledata = servicefiledata.replace '{cmd}', path.resolve(__dirname,'..','..','bin','bbs-httpserver') + ' '+args.port + ' '+args.machine_ip + ' '+args.machine_port + ' '+args.hostsystem+ ' '+args.hostdb+ ' '+args.dbuser+ ' '+args.dbpass+ ' '+args.jobfile
 
       console.log servicefiledata
       fs.writeFileSync '/etc/systemd/system/bbs.service', servicefiledata

@@ -3,9 +3,7 @@ path = require 'path'
 fs = require 'fs'
 
 app = require('express')()
-#WebSocket = require('ws')
 http = require('http').Server(app)
-#io = require('socket.io')(http)
 bbs = require('../main')
 mysql = require 'mysql'
 sss = require 'simple-stats-server'
