@@ -56,7 +56,8 @@ class Controller extends EventEmitter
   open: () ->
     me = @
     if @client==null
-      console.log 'PORT',@port
+      if process.env.DEBUG_BBS_CONTROLLER=='1'
+        console.log 'IP PORT',@ip,@port
       @client = Net.createConnection @port, @ip, () => @onConnect()
       @closeEventName = 'unexpected_closed'
       @client.setTimeout 2000

@@ -82,7 +82,8 @@ class Imprint extends EventEmitter
     @port = @address.port
     @ip = @address.address
 
-    setInterval @debugConnections.bind(@),3000
+    if process.env.DEBUG_BBS_IMPRINT=='1'
+      setInterval @debugConnections.bind(@),3000
 
     if process.env.DEBUG_BBS_IMPRINT=='1'
       console.log @address
@@ -103,8 +104,8 @@ class Imprint extends EventEmitter
     #  console.error 'onClientConnect','there is a client allready'
 
   onClientEnd: (data) ->
-    #if process.env.DEBUG_BBS_IMPRINT=='1'
-    console.log 'imprint client end'
+    if process.env.DEBUG_BBS_IMPRINT=='1'
+      console.log 'imprint client end'
     @onClientData data
 
   onClientData: (data) ->
@@ -168,8 +169,8 @@ class Imprint extends EventEmitter
     #@client = null
     if @client.destroyed==false
       @client.destroy()
-    #if process.env.DEBUG_BBS_IMPRINT=='1'
-    console.error 'onClientClose()'
+    if process.env.DEBUG_BBS_IMPRINT=='1'
+      console.error 'onClientClose()'
 
   onClientError: (err) ->
     if @client.destroyed==false
@@ -177,7 +178,7 @@ class Imprint extends EventEmitter
     if process.env.DEBUG_BBS_IMPRINT=='1'
       console.error 'client error', err
 
-      
+
   closeClient: () ->
     if @client?#!=null
       if @client.destroyed==false

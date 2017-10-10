@@ -117,7 +117,7 @@ class Sampleserver extends Command
   onServerBound: () ->
     @address = @server.address()
     #console.log('server',@address)
-    setInterval @debugConnections.bind(@),3000
+    #setInterval @debugConnections.bind(@),3000
 
     @resetTimeoutTimer()
 
