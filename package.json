@@ -1,6 +1,6 @@
 {
   "name": "tualo-bbs",
-  "version": "1.2.001",
+  "version": "1.2.002",
   "description": "bbs class collection",
   "main": "lib/main.js",
   "scripts": {
@@ -19,8 +19,9 @@
     "freeport": "^1.0.5",
     "mysql": "^2.11.1",
     "simple-stats-server": "0.0.5",
-
+    "socket.io": "^1.4.6",
     "tualo-commander": "0.0.8",
-    "tualo-template": "0.0.2"
+    "tualo-template": "0.0.2",
+    "ws": "^3.0.0"
   }
 }
