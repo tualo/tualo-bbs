@@ -413,9 +413,9 @@ class HttpServer extends Command
       me.timer = setTimeout me.getStatusTimed.bind(me), 30000
     closeFN = (message) =>
       console.log 'getStatus (timed)','closeFN'
-      if me.timer
-        clearTimeout me.timer
-      me.timer = setTimeout me.getStatusTimed.bind(me), 5000
+      #if me.timer
+      #  clearTimeout me.timer
+      #me.timer = setTimeout me.getStatusTimed.bind(me), 5000
     doneFN = (message) =>
       console.log 'getStatus (timed)','doneFN', 'next ping in 5s'
       me.lastError=null
