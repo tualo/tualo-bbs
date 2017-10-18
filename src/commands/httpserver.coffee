@@ -218,7 +218,13 @@ class HttpServer extends Command
     app.get '/status', @expressStatus.bind(@)
     app.all '/startjob', @expressStartJob.bind(@)
     app.get '/stopjob', @expressStopJob.bind(@)
+    app.get '/restartimprint', @restartImprint.bind(@)
     app.listen @args.port
+
+  restartImprint: (req, res) ->
+    me = @
+    me.imprint.reopen()
+    res.send(JSON.stringify({success: true,msg: 'imprint restarted'}))
 
   expressStatus: (req, res) ->
     me = @
