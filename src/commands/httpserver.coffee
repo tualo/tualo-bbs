@@ -71,8 +71,40 @@ class HttpServer extends Command
 
     @openExpressServer()
 
+  refreshForStopTimer: () ->
+    if @lastimprinttimer?
+      clearTimeout(@lastimprinttimer)
+    @lastimprinttimer = setTimeout(@refreshStopJob.bind(@),45000)
+
+  refreshStopJob: () ->
+    me = @
+    if me.lastState.print_job_active==1
+      if process.env.DEBUG_BBS_HTTPSERVER=='1'
+        console.log 'STOP PRINTJOB BY TIMEOUT'
+      message = {}
+      errorFN = (errMessage) =>
+        if process.env.DEBUG_BBS_HTTPSERVER=='1'
+          console.log 'refreshStopJob','errorFN',errMessage
+        me.lastError = errMessage
+        me.getStatus()
+      closeFN = (message) =>
+        if process.env.DEBUG_BBS_HTTPSERVER=='1'
+          console.log 'refreshStopJob','closeFN'
+      doneFN = (message) =>
+        @currentJob ''
+        @setCustomerFile ''
+        me.lastError=null
+        if process.env.DEBUG_BBS_HTTPSERVER=='1'
+          console.log 'refreshStopJob','doneFN'
+        me.getStatus()
+      @controller 'getStopPrintjob',closeFN,doneFN,errorFN
+
   onImprint: (imprint) ->
     @lastimprint=imprint
+    @lastimprinttime=(new Date()).getTime()
+
+    @refreshForStopTimer()
+
     message=imprint
     @jobCount+=1
     me = @
@@ -223,6 +255,7 @@ class HttpServer extends Command
 
   restartImprint: (req, res) ->
     me = @
+    console.log 'restartImprint','start'
     me.imprint.reopen()
     res.send(JSON.stringify({success: true,msg: 'imprint restarted'}))
     if process.env.DEBUG_BBS_HTTPSERVER=='1'

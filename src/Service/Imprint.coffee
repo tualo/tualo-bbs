@@ -53,8 +53,9 @@ class Imprint extends EventEmitter
       clearTimeout @timeout_timer
     #@timeout_timer = setTimeout @close.bind(@), @timeout
   reopen: () ->
-    @server.close()
-    @server=null
+    if @server != null
+      @server.close()
+      @server=null
     @open()
 
   open: () ->
