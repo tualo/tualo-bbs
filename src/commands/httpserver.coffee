@@ -225,6 +225,8 @@ class HttpServer extends Command
     me = @
     me.imprint.reopen()
     res.send(JSON.stringify({success: true,msg: 'imprint restarted'}))
+    if process.env.DEBUG_BBS_HTTPSERVER=='1'
+      console.log 'restartImprint','done'
 
   expressStatus: (req, res) ->
     me = @
