@@ -362,6 +362,7 @@ class HttpServer extends Command
           me.currentJob message.job_id
           me.setCustomerFile message.customerNumber
           res.send(JSON.stringify({success: true,msg: message}))
+          me.refreshForStopTimer()
           me.getStatus()
 
         runSeq = (seq) ->
