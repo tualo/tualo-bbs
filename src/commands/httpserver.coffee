@@ -496,10 +496,10 @@ class HttpServer extends Command
     if process.env.DEBUG_BBS_STATUSTIMINGS=='1'
       n = (new Date()).getTime()
       console.log('TIMINGS')
-      console.log('me.times.laststatus',(n-me.times.laststatus))
-      console.log('me.times.laststart',(n-me.times.laststart))
-      console.log('me.times.laststop',(n-me.times.laststop))
-      console.log('me.times.programmstart',(n-me.times.programmstart))
+      console.log('me.times.laststatus',(n-me.times.laststatus)/100,'sec')
+      console.log('me.times.laststart',(n-me.times.laststart)/100,'sec')
+      console.log('me.times.laststop',(n-me.times.laststop)/100,'sec')
+      console.log('me.times.programmstart',(n-me.times.programmstart)/100,'sec')
       console.log('~~~~~~~~~~~~~')
 
 
