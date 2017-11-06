@@ -63,6 +63,12 @@ class HttpServer extends Command
       print_job_active: 0
     me.forcestatus=true
 
+    me.times =
+      programmstart: (new Date()).getTime()
+      laststatus: (new Date()).getTime()
+      laststop: (new Date()).getTime()
+      laststart: (new Date()).getTime()
+
     me.imprint=null
     if args.machine_ip!='0'
       me.imprint = new bbs.Imprint args.machine_ip
@@ -104,6 +110,7 @@ class HttpServer extends Command
         if process.env.DEBUG_BBS_HTTPSERVER=='1'
           console.log 'refreshStopJob','doneFN'
         me.getStatus(true)
+        me.times.laststop = (new Date()).getTime()
       @controller 'getStopPrintjob',closeFN,doneFN,errorFN
 
   onImprint: (imprint) ->
@@ -305,6 +312,7 @@ class HttpServer extends Command
       if process.env.DEBUG_BBS_HTTPSERVER=='1'
         console.log 'stopJob','doneFN'
       res.send(JSON.stringify({success: true,msg: message}))
+      me.times.laststop = (new Date()).getTime()
       me.getStatus(true)
     @controller 'getStopPrintjob',closeFN,doneFN,errorFN
 
@@ -354,7 +362,7 @@ class HttpServer extends Command
             console.log 'startJob','errorFN',errMessage
           me.lastError = errMessage
           res.send(JSON.stringify({success: false,msg: errMessage.code}))
-          me.getStatus()
+          me.getStatus(true)
 
         closeFN = (doneMessage) =>
           me.currentJob message.job_id
@@ -370,6 +378,7 @@ class HttpServer extends Command
           me.setCustomerFile message.customerNumber
           res.send(JSON.stringify({success: true,msg: message}))
           me.refreshForStopTimer()
+          me.times.laststart = (new Date()).getTime()
           me.getStatus()
 
         runSeq = (seq) ->
@@ -482,6 +491,18 @@ class HttpServer extends Command
   getStatusTimed: () ->
     me = @
     runit=false
+
+
+    if process.env.DEBUG_BBS_HTTPSERVER=='1'
+      n = (new Date()).getTime()
+      console.log('TIMINGS')
+      console.log('me.times.laststatus',(n-me.times.laststatus))
+      console.log('me.times.laststart',(n-me.times.laststart))
+      console.log('me.times.laststop',(n-me.times.laststop))
+      console.log('me.times.programmstart',(n-me.times.programmstart))
+      console.log('~~~~~~~~~~~~~')
+
+
     if typeof me.lastState=='object'
       if me.lastState.print_job_active==0
         runit=true
@@ -496,6 +517,9 @@ class HttpServer extends Command
       if process.env.DEBUG_BBS_HTTPSERVER=='1'
         console.log 'getStatus (timed)','onError', 'next ping in 30s',errMessage
       me.lastError = errMessage
+      if me.lastError.code=='ETIMEDOUT'
+        console.log('TIMEOUT!!!!!!!!!!!!!!!!!!!!!!!!!')
+
       if me.timer
         clearTimeout me.timer
       me.timer = setTimeout me.getStatusTimed.bind(me), 30000
@@ -514,6 +538,7 @@ class HttpServer extends Command
         # let's go, close the client there is no active job anymore
         me.imprint.closeClient()
 
+      me.times.laststatus= (new Date()).getTime()
       if me.timer
         clearTimeout me.timer
       me.timer = setTimeout me.getStatusTimed.bind(me), 5000
