@@ -77,7 +77,11 @@ class HttpServer extends Command
   refreshForStopTimer: () ->
     if @lastimprinttimer?
       clearTimeout(@lastimprinttimer)
-    @lastimprinttimer = setTimeout(@refreshStopJob.bind(@),45000)
+    if process.env.BBS_DONTSTOPJOB=='1'
+      if process.env.DEBUG_BBS_HTTPSERVER=='1'
+        console.log 'd'
+    else
+      @lastimprinttimer = setTimeout(@refreshStopJob.bind(@),45000)
 
   refreshStopJob: () ->
     me = @
@@ -89,7 +93,7 @@ class HttpServer extends Command
         if process.env.DEBUG_BBS_HTTPSERVER=='1'
           console.log 'refreshStopJob','errorFN',errMessage
         me.lastError = errMessage
-        me.getStatus()
+        me.getStatus(true)
       closeFN = (message) =>
         if process.env.DEBUG_BBS_HTTPSERVER=='1'
           console.log 'refreshStopJob','closeFN'
@@ -99,7 +103,7 @@ class HttpServer extends Command
         me.lastError=null
         if process.env.DEBUG_BBS_HTTPSERVER=='1'
           console.log 'refreshStopJob','doneFN'
-        me.getStatus()
+        me.getStatus(true)
       @controller 'getStopPrintjob',closeFN,doneFN,errorFN
 
   onImprint: (imprint) ->
