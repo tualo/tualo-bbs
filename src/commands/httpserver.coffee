@@ -493,7 +493,7 @@ class HttpServer extends Command
     runit=false
 
 
-    if process.env.DEBUG_BBS_HTTPSERVER=='1'
+    if process.env.DEBUG_BBS_STATUSTIMINGS=='1'
       n = (new Date()).getTime()
       console.log('TIMINGS')
       console.log('me.times.laststatus',(n-me.times.laststatus))
@@ -518,7 +518,7 @@ class HttpServer extends Command
         console.log 'getStatus (timed)','onError', 'next ping in 30s',errMessage
       me.lastError = errMessage
       if me.lastError.code=='ETIMEDOUT'
-        console.log('TIMEOUT!!!!!!!!!!!!!!!!!!!!!!!!!')
+        console.log('TIMEOUT!!!!!!!!!!!!!!!!!!!!!!!!!',me.lastError)
 
       if me.timer
         clearTimeout me.timer
