@@ -495,7 +495,7 @@ class HttpServer extends Command
 
     if process.env.DEBUG_BBS_STATUSTIMINGS=='1'
       n = (new Date()).getTime()
-      console.log('TIMINGS')
+      console.log('TIMINGS',new Date())
       console.log('me.times.laststatus',(n-me.times.laststatus)/1000,'sec')
       console.log('me.times.laststart',(n-me.times.laststart)/1000,'sec')
       console.log('me.times.laststop',(n-me.times.laststop)/1000,'sec')
