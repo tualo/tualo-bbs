@@ -60,7 +60,7 @@ class Controller extends EventEmitter
         console.log 'IP PORT',@ip,@port
       @client = Net.createConnection @port, @ip, () => @onConnect()
       @closeEventName = 'unexpected_closed'
-      @client.setTimeout 2000
+      @client.setTimeout 3000
       @client.on 'timeout', (err) ->
         if process.env.DEBUG_BBS_CONTROLLER=='1'
           console.log 'controller socket timeout'

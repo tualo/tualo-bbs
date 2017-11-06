@@ -59,6 +59,9 @@ class HttpServer extends Command
     me.addressfield = 'L'
     me.pool = @connection
     args = @args
+    me.lastState =
+      print_job_active: 0
+    me.forcestatus=true
 
     me.imprint=null
     if args.machine_ip!='0'
@@ -287,7 +290,7 @@ class HttpServer extends Command
         console.log 'stopJob','errorFN',errMessage
       me.lastError = errMessage
       res.send(JSON.stringify({success: false,msg: errMessage.code}))
-      me.getStatus()
+      me.getStatus(true)
     closeFN = (message) =>
       if process.env.DEBUG_BBS_HTTPSERVER=='1'
         console.log 'stopJob','closeFN'
@@ -298,14 +301,14 @@ class HttpServer extends Command
       if process.env.DEBUG_BBS_HTTPSERVER=='1'
         console.log 'stopJob','doneFN'
       res.send(JSON.stringify({success: true,msg: message}))
-      me.getStatus()
+      me.getStatus(true)
     @controller 'getStopPrintjob',closeFN,doneFN,errorFN
 
   expressStartJob: (req, res) ->
     me = @
     try
       if me.lastState.print_job_active==1
-        res.send(JSON.stringify({success: false,msg: "Es wird bereits ein Druckauftrag asugeführt"}))
+        res.send(JSON.stringify({success: false,msg: "Es wird bereits ein Druckauftrag ausgeführt"}))
       else
         bodymessage = {}
         try
@@ -464,13 +467,27 @@ class HttpServer extends Command
         seq.run()
       ctrl.open()
 
-  getStatus: () ->
+  getStatus: (force) ->
     if @timer
       clearTimeout @timer
+
+    if force==true
+      @forcestatus=true
     @getStatusTimed()
 
   getStatusTimed: () ->
     me = @
+    runit=false
+    if typeof me.lastState=='object'
+      if me.lastState.print_job_active==0
+        runit=true
+    else
+      runit=true
+
+    if me.forcestatus==true
+      runit=true
+      me.forcestatus=false
+
     errorFN = (errMessage) =>
       if process.env.DEBUG_BBS_HTTPSERVER=='1'
         console.log 'getStatus (timed)','onError', 'next ping in 30s',errMessage
@@ -496,4 +513,6 @@ class HttpServer extends Command
       if me.timer
         clearTimeout me.timer
       me.timer = setTimeout me.getStatusTimed.bind(me), 5000
-    @controller 'getStatusLight',closeFN,doneFN,errorFN,null
+
+    if runit==true
+      @controller 'getStatusLight',closeFN,doneFN,errorFN,null
