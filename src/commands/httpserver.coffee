@@ -265,6 +265,7 @@ class HttpServer extends Command
     app.all '/startjob', @expressStartJob.bind(@)
     app.get '/stopjob', @expressStopJob.bind(@)
     app.get '/restartimprint', @restartImprint.bind(@)
+    app.all '/hotswitch', @expressHotSwitch.bind(@)
     app.listen @args.port
 
   restartImprint: (req, res) ->
@@ -315,6 +316,20 @@ class HttpServer extends Command
       me.times.laststop = (new Date()).getTime()
       me.getStatus(true)
     @controller 'getStopPrintjob',closeFN,doneFN,errorFN
+
+  expressHotSwitch: (req, res) ->
+    me = @
+    message = {}
+
+    if typeof me.lastStartJobMessage=='object'
+      me.customerNumber = req.body.customerNumber+'|'+req.body.costcenter
+      me.lastStartJobMessage.customerNumber = req.body.customerNumber+'|'+req.body.costcenter
+      me.lastStartJobMessage.kundennummer = req.body.customerNumber
+      me.lastStartJobMessage.kostenstelle = req.body.costcenter
+
+    me.setCustomerFile me.lastStartJobMessage.customerNumber
+    res.send(JSON.stringify({success: true,msg: message}))
+
 
   expressStartJob: (req, res) ->
     me = @
