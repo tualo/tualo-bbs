@@ -330,7 +330,6 @@ class HttpServer extends Command
 
     bodymessage = {}
     try
-      console.log(req.body)
       bodymessage = JSON.parse(req.body.message)
       if process.env.DEBUG_BBS_HTTPSERVER=='1'
         console.log '########################'
