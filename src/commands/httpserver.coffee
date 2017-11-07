@@ -114,7 +114,10 @@ class HttpServer extends Command
       @controller 'getStopPrintjob',closeFN,doneFN,errorFN
 
   onImprint: (imprint) ->
+    imprint.job_id = @currentJobID
     @lastimprint=imprint
+
+
     @lastimprinttime=(new Date()).getTime()
 
     @refreshForStopTimer()
@@ -185,7 +188,6 @@ class HttpServer extends Command
     sql  = sql.replace('{addressfield}',me.addressfield)
 
     sql  = sql.replace('{login}','sorter')
-
 
 
     fn = (err, connection) ->
@@ -321,13 +323,52 @@ class HttpServer extends Command
     me = @
     message = {}
 
-    if typeof me.lastStartJobMessage=='object'
-      me.customerNumber = req.body.customerNumber+'|'+req.body.costcenter
-      me.lastStartJobMessage.customerNumber = req.body.customerNumber+'|'+req.body.costcenter
-      me.lastStartJobMessage.kundennummer = req.body.customerNumber
-      me.lastStartJobMessage.kostenstelle = req.body.costcenter
+    #if typeof me.lastStartJobMessage=='object'
+    #  me.lastStartJobMessage.customerNumber = req.body.customerNumber+'|'+req.body.costcenter
+    #  me.lastStartJobMessage.kundennummer = req.body.customerNumber
+    #  me.lastStartJobMessage.kostenstelle = req.body.costcenter
 
-    me.setCustomerFile me.lastStartJobMessage.customerNumber
+    bodymessage = {}
+    try
+      console.log(req.body)
+      bodymessage = JSON.parse(req.body.message)
+      if process.env.DEBUG_BBS_HTTPSERVER=='1'
+        console.log '########################'
+        console.log '########################'
+        console.log bodymessage
+        console.log '########################'
+        console.log '########################'
+    catch e
+      console.log e
+
+    message = {
+      job_id: 1,
+      weight_mode: 3,
+      customerNumber: '69000|0',
+      kundennummer: '69000',
+      kostenstelle: 0,
+      waregroup: 'Standardsendungen',
+      label_offset: 0,
+      date_offset: 0,
+      stamp: 1,
+      addressfield: 'L',
+      print_date: 1,
+      print_endorsement: 1,
+      endorsement1: 'endors',
+      endorsement2: 'endors',
+      advert: '02042a3d422a7b9884329e0df9000000006a0000000000000000000000b93c00000000000000002102220100000000000000000000000000002c00000039004d00ffffffffffffffff0b0057657262756e672d3034001200f3fb07f3f12a03f6f3fbfff3fbfff3fb16f502072a3d422a7b9884c6a899bb00000000120000000000000000000000'
+    }
+
+    for k,v of message
+      if bodymessage.hasOwnProperty(k)
+        message[k]=bodymessage[k]
+    #message.advert="AgQqPUIqe5iEMp4N+QAAAABqAAAAAAAAAAAAAAC5PAAAAAAAAAAAIQIiAQAAAAAAAAAAAAAAAAAALAAAADkATQD//////////wsAV2VyYnVuZy0wNAASAPP7B/PxKgP28/v/8/v/8/sW9QIHKj1CKnuYhMaombsAAAAAEgAAAAAAAAAAAAAA"
+    me.lastStartJobMessage = message
+
+    me.currentJob message.job_id
+    me.setCustomerFile message.customerNumber
+    me.customerNumber = message.customerNumber
+    me.jobCount = 0
     res.send(JSON.stringify({success: true,msg: message}))
 
 
@@ -437,6 +478,7 @@ class HttpServer extends Command
 
 
   currentJob: (job) ->
+    @currentJobID = job
     if process.env.DEBUG_BBS_HTTPSERVER=='1'
       console.log('set job: ',job)
     fs.writeFile @jobfile, job, (err) ->
