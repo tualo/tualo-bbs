@@ -87,7 +87,7 @@ class HttpServer extends Command
       if process.env.DEBUG_BBS_HTTPSERVER=='1'
         console.log 'd'
     else
-      @lastimprinttimer = setTimeout(@refreshStopJob.bind(@),45000)
+      @lastimprinttimer = setTimeout(@refreshStopJob.bind(@),120000)
 
   refreshStopJob: () ->
     me = @
