@@ -20,6 +20,7 @@ class Imprint extends EventEmitter
 
   getPort: () ->
     @address.port
+
   getIP: () ->
     res = "127.0.0.1"
     ifaces = os.networkInterfaces()
@@ -72,7 +73,8 @@ class Imprint extends EventEmitter
       @server = net.createServer options, (client) => @onClientConnect(client)
       @server.on 'error', (err) => @onServerError(err)
       @server.on 'close', () => @onServerClose()
-      @server.listen 0, @getIP(), () => @onServerBound()
+      #@server.listen 0, @getIP(), () => @onServerBound()
+      @server.listen 0, '0.0.0.0', () => @onServerBound()
 
   onServerError: (err) ->
     console.error err

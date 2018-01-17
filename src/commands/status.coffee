@@ -7,7 +7,7 @@ Net = require 'net'
 module.exports =
 class Status extends Command
   @commandName: 'status'
-  @commandArgs: ['ip']
+  @commandArgs: ['ip','port']
   @commandShortDescription: 'query the machine status'
   @options: [
   ]
@@ -22,7 +22,7 @@ class Status extends Command
 
     if args.ip
       @ctrl = new Controller
-      @ctrl.setPort 4444
+      @ctrl.setPort args.port
       @ctrl.setIP args.ip
       @ctrl.on 'ready', ()=>@onReady()
       @ctrl.on 'closed', ()=>@onCtrlClosed()
