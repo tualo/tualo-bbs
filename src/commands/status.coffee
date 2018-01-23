@@ -10,6 +10,7 @@ class Status extends Command
   @commandArgs: ['ip','port']
   @commandShortDescription: 'query the machine status'
   @options: [
+
   ]
 
 

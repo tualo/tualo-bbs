@@ -268,7 +268,7 @@ class HttpServer extends Command
     app.get '/stopjob', @expressStopJob.bind(@)
     app.get '/restartimprint', @restartImprint.bind(@)
     app.all '/hotswitch', @expressHotSwitch.bind(@)
-    app.listen @args.port
+    app.listen @args.port,'0.0.0.0'
 
   restartImprint: (req, res) ->
     me = @
@@ -576,15 +576,15 @@ class HttpServer extends Command
       if me.lastError.code=='ETIMEDOUT'
         console.log('TIMEOUT!!!!!!!!!!!!!!!!!!!!!!!!!',me.lastError)
 
-      if me.timer
-        clearTimeout me.timer
-      me.timer = setTimeout me.getStatusTimed.bind(me), 30000
+      #if me.timer
+      #  clearTimeout me.timer
+      #me.timer = setTimeout me.getStatus.bind(me), 30000
     closeFN = (message) =>
       if process.env.DEBUG_BBS_HTTPSERVER=='1'
         console.log 'getStatus (timed)','closeFN'
       #if me.timer
       #  clearTimeout me.timer
-      #me.timer = setTimeout me.getStatusTimed.bind(me), 5000
+      me.timer = setTimeout me.getStatus.bind(me), 5000
     doneFN = (message) =>
       if process.env.DEBUG_BBS_HTTPSERVER=='1'
         console.log 'getStatus (timed)','doneFN', 'next ping in 5s'
@@ -595,9 +595,9 @@ class HttpServer extends Command
         me.imprint.closeClient()
 
       me.times.laststatus= (new Date()).getTime()
-      if me.timer
-        clearTimeout me.timer
-      me.timer = setTimeout me.getStatusTimed.bind(me), 5000
+      #if me.timer
+      #  clearTimeout me.timer
+      #me.timer = setTimeout me.getStatusTimed.bind(me), 5000
 
     if runit==true
       @controller 'getStatusLight',closeFN,doneFN,errorFN,null
