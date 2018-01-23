@@ -1,6 +1,7 @@
 {Command} = require 'tualo-commander'
 path = require 'path'
 fs = require 'fs'
+{spawn} = require 'child_process'
 
 app = require('express')()
 http = require('http').Server(app)
@@ -268,6 +269,7 @@ class HttpServer extends Command
     app.get '/stopjob', @expressStopJob.bind(@)
     app.get '/restartimprint', @restartImprint.bind(@)
     app.all '/hotswitch', @expressHotSwitch.bind(@)
+    app.all '/reboot', @expressReboot.bind(@)
     app.listen @args.port,'0.0.0.0'
 
   restartImprint: (req, res) ->
@@ -277,6 +279,13 @@ class HttpServer extends Command
     res.send(JSON.stringify({success: true,msg: 'imprint restarted'}))
     if process.env.DEBUG_BBS_HTTPSERVER=='1'
       console.log 'restartImprint','done'
+
+  expressReboot: (req, res) ->
+    me = @
+    fn = () ->
+      rebootProc = spawn 'reboot', []
+    res.send(JSON.stringify({success: true,msg: "rebooting"}))
+    setTimeout fn.bind(me), 3000
 
   expressStatus: (req, res) ->
     me = @
