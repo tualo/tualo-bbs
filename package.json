@@ -1,6 +1,6 @@
 {
   "name": "tualo-bbs",
-  "version": "1.2.002",
+  "version": "1.2.003",
   "description": "bbs class collection",
   "main": "lib/main.js",
   "scripts": {
