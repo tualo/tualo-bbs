@@ -60,7 +60,7 @@ class Controller extends EventEmitter
 
 
 
-    if @client==null
+    if @client==null or @client.destroyed
       if process.env.DEBUG_BBS_CONTROLLER=='1'
         console.log 'IP PORT',@ip,@port
       @client = Net.createConnection @port, @ip, () => @onConnect()
@@ -134,15 +134,15 @@ class Controller extends EventEmitter
       console.log 'onEnd'
     if typeof @client!='undefined' and @client != null
       @lasteventname = @client.closeEventName
-      @client.destroy()
-      @client=null
+      #@client.destroy()
+      #@client=null
 
   onClose: () ->
     #@stopTimeoutTimer()
     @emit "closed",@lasteventname
-    @client=null
+    #@client=null
 
 
   close: () ->
-    if typeof @client!='undefined' and @client != null
-      @client.end()
+    #if typeof @client!='undefined' and @client != null
+      #@client.end()
