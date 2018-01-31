@@ -29,6 +29,10 @@ class HttpServer extends Command
       me = @
       me.waregroup = 'Standardsendungen'
 
+      # 31.01.2018 only one controller
+      @ctrl = new bbs.Controller()
+
+
       me.jobfile = args.jobfile||'/opt/grab/job.txt'
       if process.env.DEBUG_BBS_HTTPSERVER=='1'
         console.log @args
@@ -523,27 +527,29 @@ class HttpServer extends Command
       setTimeout deferFN,1500
     else
       me.queryIsRunning = true
-      ctrl = new bbs.Controller()
-      ctrl.setIP(args.machine_ip,args.machine_port)
-      ctrl.on 'error',(msg) ->
+      # 31.01.2018 only one controller
+      @ctrl.setIP(args.machine_ip,args.machine_port)
+
+      @ctrl.once 'error',(msg) ->
         me.queryIsRunning = false
         if typeof onError=='function'
           onError msg
-      ctrl.on 'closed',(msg) ->
+      @ctrl.once 'closed',(msg) ->
         if process.env.DEBUG_BBS_HTTPSERVER=='1'
           console.log 'controller',sequenceFN,'ctrl close'
         onClosed msg
-      ctrl.on 'ready', () ->
+      @ctrl.once 'ready', () ->
         me.queryIsRunning = false
         seq = ctrl[sequenceFN]()
         if typeof runseq=='function'
           runseq seq
-        seq.on 'end',(endMsg) ->
+        seq.once 'end',(endMsg) ->
           if typeof onDone=='function'
             onDone endMsg
-          ctrl.close()
+          # ctrl.close()
         seq.run()
-      ctrl.open()
+
+      @ctrl.open()
 
   getStatus: (force) ->
     if process.env.DEBUG_BBS_STATUSTIMINGS=='1'
