@@ -16,6 +16,8 @@ class Controller extends EventEmitter
     @port = 4444 # fixed
     @client = null
     @closingService = false
+
+
     #console.log @
 
   setPort: (val) ->
@@ -55,6 +57,9 @@ class Controller extends EventEmitter
 
   open: () ->
     me = @
+
+
+
     if @client==null
       if process.env.DEBUG_BBS_CONTROLLER=='1'
         console.log 'IP PORT',@ip,@port
