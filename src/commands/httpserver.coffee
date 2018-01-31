@@ -540,7 +540,7 @@ class HttpServer extends Command
         onClosed msg
       @ctrl.once 'ready', () ->
         me.queryIsRunning = false
-        seq = ctrl[sequenceFN]()
+        seq = me.ctrl[sequenceFN]()
         if typeof runseq=='function'
           runseq seq
         seq.once 'end',(endMsg) ->
