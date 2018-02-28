@@ -536,6 +536,8 @@ class HttpServer extends Command
           onError msg
 
       @ctrl.once 'done',(msg) ->
+        if process.env.DEBUG_BBS_HTTPSERVER=='1'
+          console.log 'controller',sequenceFN,'ctrl done',msg
         if typeof onDone=='function'
           onDone msg
 
@@ -543,7 +545,7 @@ class HttpServer extends Command
         if process.env.DEBUG_BBS_HTTPSERVER=='1'
           console.log 'controller',sequenceFN,'ctrl close',msg
         onClosed msg
-        
+
       @ctrl.once 'ready', () ->
         me.queryIsRunning = false
         seq = me.ctrl[sequenceFN]()
