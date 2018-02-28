@@ -538,7 +538,7 @@ class HttpServer extends Command
         if process.env.DEBUG_BBS_HTTPSERVER=='1'
           console.log 'controller',sequenceFN,'ctrl close',msg
         if typeof onDone=='function'
-          onDone endMsg
+          onDone msg
         onClosed msg
       @ctrl.once 'ready', () ->
         me.queryIsRunning = false
