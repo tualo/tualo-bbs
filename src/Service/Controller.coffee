@@ -111,6 +111,7 @@ class Controller extends EventEmitter
   onStatus: (message) ->
     #@resetTimeoutTimer()
     @emit 'status', message
+    @emit 'done', message
 
   getStartPrintjob: () ->
     seq = new StartPrintjob @client
@@ -119,6 +120,7 @@ class Controller extends EventEmitter
   onStartPrintjob: (message) ->
     #@resetTimeoutTimer()
     @emit 'startPrintJob', message
+    @emit 'done', message
 
   getStopPrintjob: () ->
     seq = new StopPrintjob @client
@@ -127,6 +129,7 @@ class Controller extends EventEmitter
   onStopPrintjob: (message) ->
     #@resetTimeoutTimer()
     @emit 'stopPrintJob', message
+    @emit 'done', message
 
   onEnd: () ->
     #@emit "end"

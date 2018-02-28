@@ -530,16 +530,20 @@ class HttpServer extends Command
       # 31.01.2018 only one controller
       @ctrl.setIP(args.machine_ip,args.machine_port)
 
-      @ctrl.once 'error',(msg) ->
+      @ctrl.on 'error',(msg) ->
         me.queryIsRunning = false
         if typeof onError=='function'
           onError msg
+
+      @ctrl.once 'done',(msg) ->
+        if typeof onDone=='function'
+          onDone msg
+
       @ctrl.once 'closed',(msg) ->
         if process.env.DEBUG_BBS_HTTPSERVER=='1'
           console.log 'controller',sequenceFN,'ctrl close',msg
-        if typeof onDone=='function'
-          onDone msg
         onClosed msg
+        
       @ctrl.once 'ready', () ->
         me.queryIsRunning = false
         seq = me.ctrl[sequenceFN]()
