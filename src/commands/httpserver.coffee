@@ -536,7 +536,7 @@ class HttpServer extends Command
           onError msg
       @ctrl.once 'closed',(msg) ->
         if process.env.DEBUG_BBS_HTTPSERVER=='1'
-          console.log 'controller',sequenceFN,'ctrl close'
+          console.log 'controller',sequenceFN,'ctrl close',msg
         if typeof onDone=='function'
           onDone endMsg
         onClosed msg
