@@ -597,6 +597,8 @@ class HttpServer extends Command
 
       #if me.timer
       #  clearTimeout me.timer
+
+      me.timer = setTimeout me.getStatus.bind(me), 5000
       #me.timer = setTimeout me.getStatus.bind(me), 30000
     closeFN = (message) =>
       if process.env.DEBUG_BBS_HTTPSERVER=='1'
