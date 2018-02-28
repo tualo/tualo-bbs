@@ -99,7 +99,6 @@ class StartPrintjob extends Sequence
         console.log 'TYPE_BBS_START_PRINTJOB'
       @message = message
 
-      @emit 'startjob', message
       @once 'message', (message) => @onCloseService(message)
       @sendCloseService()
       if process.env.DEBUG_BBS_STARTJOB=='1'
@@ -108,6 +107,7 @@ class StartPrintjob extends Sequence
       if process.env.DEBUG_BBS_STARTJOB=='1'
         console.log 'StartPrintjob', 'TYPE_ACK', message
         console.log 'TYPE_ACK'
+      @emit 'startjob', message
       @once 'message', (message) => @onCloseService(message)
       @sendCloseService()
     else
