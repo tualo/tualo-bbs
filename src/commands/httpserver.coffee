@@ -535,11 +535,6 @@ class HttpServer extends Command
         if typeof onError=='function'
           onError msg
 
-      @ctrl.once 'done',(msg) ->
-        if process.env.DEBUG_BBS_HTTPSERVER=='1'
-          console.log 'controller',sequenceFN,'ctrl done',msg
-        if typeof onDone=='function'
-          onDone msg
 
       @ctrl.once 'closed',(msg) ->
         if process.env.DEBUG_BBS_HTTPSERVER=='1'
@@ -551,6 +546,12 @@ class HttpServer extends Command
         seq = me.ctrl[sequenceFN]()
         if typeof runseq=='function'
           runseq seq
+
+        seq.once 'message',(msg) ->
+          if process.env.DEBUG_BBS_HTTPSERVER=='1'
+            console.log 'controller',sequenceFN,'ctrl sequence message',msg
+          if typeof onDone=='function'
+            onDone msg
         seq.once 'end',(endMsg) ->
           #if typeof onDone=='function'
           #  onDone endMsg
