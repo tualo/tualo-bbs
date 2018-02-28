@@ -103,6 +103,7 @@ class Controller extends EventEmitter
     #@resetTimeoutTimer()
     @seq.removeAllListeners()
     @emit 'statusLight', message
+    @emit 'done', message
 
   getStatus: () ->
     seq = new Status @client
