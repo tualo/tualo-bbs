@@ -498,7 +498,7 @@ class HttpServer extends Command
   setCustomerFile: (kn) ->
     fs.exists '/opt/grab/customer.txt',(exists)->
       if exists
-        fs.writeFile '/opt/grab/customer.txt', 'kn', (err) ->
+        fs.writeFile '/opt/grab/customer.txt', kn, (err) ->
           if err
             console.log err
 
