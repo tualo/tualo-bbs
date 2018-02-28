@@ -38,6 +38,7 @@ class StatusLight extends Sequence
 
   onGetStatusLight: (message) ->
     if process.env.DEBUG_BBS_STATUS=='1'
+      @emit 'statuslight', message
       console.log('onGetStatusLight',message,Message.TYPE_BBS_RETURN_STATUS_LIGHT)
     if message.type_of_message == Message.TYPE_BBS_RETURN_STATUS_LIGHT
       @message = message

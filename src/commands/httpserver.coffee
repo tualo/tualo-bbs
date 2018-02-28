@@ -547,11 +547,24 @@ class HttpServer extends Command
         if typeof runseq=='function'
           runseq seq
 
-        seq.once 'message',(msg) ->
+        seq.once 'statuslight',(msg) ->
           if process.env.DEBUG_BBS_HTTPSERVER=='1'
-            console.log 'controller',sequenceFN,'ctrl sequence message',msg
+            console.log 'controller',sequenceFN,'ctrl sequence statuslight',msg
           if typeof onDone=='function'
             onDone msg
+
+        seq.once 'stopjob',(msg) ->
+          if process.env.DEBUG_BBS_HTTPSERVER=='1'
+            console.log 'controller',sequenceFN,'ctrl sequence stopjob',msg
+          if typeof onDone=='function'
+            onDone msg
+
+        seq.once 'startjob',(msg) ->
+          if process.env.DEBUG_BBS_HTTPSERVER=='1'
+            console.log 'controller',sequenceFN,'ctrl sequence startjob',msg
+          if typeof onDone=='function'
+            onDone msg
+
         seq.once 'end',(endMsg) ->
           #if typeof onDone=='function'
           #  onDone endMsg

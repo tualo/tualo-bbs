@@ -40,6 +40,7 @@ class StopPrintjob extends Sequence
       console.log 'MSG2CUSTOPPRINTJOB','onStopPrintJob',message,'Message.TYPE_BBS_STOP_PRINTJOB',Message.TYPE_BBS_STOP_PRINTJOB
     #if message.type_of_message == Message.TYPE_BBS_STOP_PRINTJOB
     @message = message
+    @emit 'stopjob', message
     @once 'message', (message) => @onCloseService(message)
     @sendCloseService()
     #else
