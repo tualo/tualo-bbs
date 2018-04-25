@@ -243,6 +243,7 @@ class HttpServer extends Command
 
   openExpressServer: () ->
     @getStatusTimed()
+    
     express = require('express')
     bodyParser = require('body-parser')
     app = express()
@@ -254,7 +255,7 @@ class HttpServer extends Command
       #console.log req
       result = {success: true}
 
-      if me.start_without_printing_running == true
+      if @start_without_printing_running == true
         result.machine_ip = @args.machine_ip
         result.machine_port = @args.machine_port
         result.lastimprint = @lastimprint
