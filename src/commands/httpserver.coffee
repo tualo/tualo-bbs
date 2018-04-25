@@ -512,15 +512,15 @@ class HttpServer extends Command
           endorsement2 = ''
           if message.endorsement2
             endorsement2 = message.endorsement2
-          #adv = ''
+          adv = ''
           #adv = '02042a3d422a7b9884329e0df9000000006a0000000000000000000000b93c00000000000000002102220100000000000000000000000000002c00000039004d00ffffffffffffffff0b0057657262756e672d3034001200f3fb07f3f12a03f6f3fbfff3fbfff3fb16f502072a3d422a7b9884c6a899bb00000000120000000000000000000000'
-          #if message.advert
-          #  if message.advert.length>30
-          #    adv = message.advert
+          if message.advert
+            if message.advert.length>30
+              adv = message.advert
           seq.setEndorsementText1(endorsement1)
           seq.setEndorsementText2(endorsement2)
-          #if adv.length>30
-          #  seq.setAdvertHex adv
+          if adv.length>30
+            seq.setAdvertHex adv
 
           seq.setImprintChannelPort(me.imprint.getPort())
           seq.setImprintChannelIP(me.imprint.getIP())
