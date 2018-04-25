@@ -254,6 +254,20 @@ class HttpServer extends Command
       #console.log req
       result = {success: true}
 
+      if me.start_without_printing_running == true
+        result.machine_ip = @args.machine_ip
+        result.machine_port = @args.machine_port
+        result.lastimprint = @lastimprint
+        result.jobCount = @jobCount
+        result.lastError = @lastError
+        result.lastState = @lastState
+        result.lastState.print_job_active = 1
+        result.lastSQLError=@lastSQLError
+        result.lastStartJobMessage = @lastStartJobMessage
+
+        res.send(JSON.stringify(result))
+        return
+
       result.machine_ip = @args.machine_ip
       result.machine_port = @args.machine_port
       result.lastimprint = @lastimprint
@@ -301,6 +315,8 @@ class HttpServer extends Command
       #  print_job_active: 1
       #  print_job_id: 177086
       #  system_uid: 330
+      if process.env.DEBUG_BBS_HTTPSERVER=='1'
+        console.log 'start_without_printing_running','status',message
 
       res.send(JSON.stringify({success: true,msg: message}))
       return
