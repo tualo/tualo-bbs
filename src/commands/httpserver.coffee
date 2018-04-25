@@ -290,6 +290,20 @@ class HttpServer extends Command
 
   expressStatus: (req, res) ->
     me = @
+    if me.start_without_printing_running == true
+      message = me.lastState
+      message.print_job_active = 1
+      message.print_job_id = 999999
+      #
+      #  available_scale: 3
+      #  available_scale_text: "3: Static and dynamic scale"
+      #  interface_of_message: 9
+      #  print_job_active: 1
+      #  print_job_id: 177086
+      #  system_uid: 330
+
+      res.send(JSON.stringify({success: true,msg: message}))
+      return
     errorFN = (errMessage) =>
       if process.env.DEBUG_BBS_HTTPSERVER=='1'
         console.log 'expressStatus','errorFN',errMessage
@@ -309,6 +323,13 @@ class HttpServer extends Command
   expressStopJob: (req, res) ->
     me = @
     message = {}
+    if me.start_without_printing_running == true
+      @currentJob ''
+      @setCustomerFile ''
+      me.start_without_printing_running = false
+      res.send(JSON.stringify({success: true,msg: {} }))
+      return
+
     errorFN = (errMessage) =>
       if process.env.DEBUG_BBS_HTTPSERVER=='1'
         console.log 'stopJob','errorFN',errMessage
@@ -418,6 +439,7 @@ class HttpServer extends Command
         }
         if bodymessage.hasOwnProperty('start_without_printing')
           if bodymessage.start_without_printing*1==1
+            me.start_without_printing_running = true
             me.currentJob message.job_id
             me.setCustomerFile message.customerNumber
             res.send(JSON.stringify({success: true,msg: 'Nur Transportieren kann einstellt werden.'}))
