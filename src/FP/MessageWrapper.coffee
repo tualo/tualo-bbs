@@ -108,13 +108,13 @@ class MessageWrapper
 
       if msg == null
         msg = new MSG2DCNAK()
-        if process.env.DEBUG_BBS_MSG=='1'
-          console.error('unknown message type '+message_type.toString(16))
+        console.error('unknown message type '+message_type.toString(16))
 
       msg.setMessageType message_type
       msg.setMessageInterface message_interface
       temp_data = data.slice data.position
-      msg.readApplictiondata temp_data
+      if temp_data.length>0
+        msg.readApplictiondata temp_data
 
     else
       throw new Error "Incorrect Message length"

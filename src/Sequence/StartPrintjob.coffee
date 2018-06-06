@@ -36,7 +36,6 @@ class StartPrintjob extends Sequence
   setEndorsementText2: (val) ->
     @start_message.setEndorsementText2 val
   setAdvert: (val) ->
-    console.log 'StartPrintjob setAdvert', val
     @start_message.setAdvert val
   setAdvertHex: (val) ->
     try
