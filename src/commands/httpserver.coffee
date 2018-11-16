@@ -456,6 +456,10 @@ class HttpServer extends Command
         }
         if bodymessage.hasOwnProperty('start_without_printing')
           if bodymessage.start_without_printing*1==1
+            for k,v of message
+              if bodymessage.hasOwnProperty(k)
+                message[k]=bodymessage[k]
+
             me.start_without_printing_running = true
             me.currentJob message.job_id
             me.setCustomerFile message.customerNumber
