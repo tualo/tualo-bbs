@@ -285,6 +285,7 @@ class HttpServer extends Command
     app.get '/stopjob', @expressStopJob.bind(@)
     app.get '/restartimprint', @restartImprint.bind(@)
     app.all '/hotswitch', @expressHotSwitch.bind(@)
+    app.all '/returnstate', @expressReturnState.bind(@)
     app.all '/reboot', @expressReboot.bind(@)
     app.listen @args.port,'0.0.0.0'
 
@@ -366,6 +367,14 @@ class HttpServer extends Command
       me.times.laststop = (new Date()).getTime()
       me.getStatus(true)
     @controller 'getStopPrintjob',closeFN,doneFN,errorFN
+
+
+  expressReturnState: (req, res) ->
+    me = @
+    message = {}
+    bodymessage = JSON.parse(req.body.message)
+    me.setReturnState bodymessage.state
+    res.send(JSON.stringify({success: true,msg: message}))
 
   expressHotSwitch: (req, res) ->
     me = @
@@ -550,6 +559,13 @@ class HttpServer extends Command
     fs.exists '/opt/grab/customer.txt',(exists)->
       if exists
         fs.writeFile '/opt/grab/customer.txt', kn, (err) ->
+          if err
+            console.log err
+
+  setReturnState: (state) ->
+    fs.exists '/opt/grab/returnstate.txt',(exists)->
+      if exists
+        fs.writeFile '/opt/grab/returnstate.txt', state, (err) ->
           if err
             console.log err
 
