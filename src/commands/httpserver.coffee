@@ -384,7 +384,7 @@ class HttpServer extends Command
     bodymessage = JSON.parse(req.body.message)
     me.currentJob ''
     me.setCustomerFile ''
-    me.setResultState bodymessage.resultstate 
+    me.setResultState bodymessage.resultstate
     # proc = spawn 'stty', ['-F','/dev/ttyUSB0','speed','9600','cs8']
     # proc1 = spawn 'stty', ['-F','/dev/ttyUSB0','speed','9600','cs8']
     # proc2 = spawn 'echo', ['-n','/dev/ttyUSB0','speed','9600','cs8']
