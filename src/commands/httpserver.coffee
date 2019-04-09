@@ -385,12 +385,6 @@ class HttpServer extends Command
     me.currentJob ''
     me.setCustomerFile ''
     me.setResultState bodymessage.resultstate
-    # proc = spawn 'stty', ['-F','/dev/ttyUSB0','speed','9600','cs8']
-    # proc1 = spawn 'stty', ['-F','/dev/ttyUSB0','speed','9600','cs8']
-    # proc2 = spawn 'echo', ['-n','/dev/ttyUSB0','speed','9600','cs8']
-    # stty -F /dev/ttyUSB0 speed 9600 cs8
-    # echo -n -e '\xA0\x01\x00\xA1' > /dev/ttyUSB0 # Relay AUS
-    # echo -n -e '\xA0\x01\x01\xA2' > /dev/ttyUSB0 # Relay AN
     res.send(JSON.stringify({success: true,msg: '.'}))
 
   expressHotSwitch: (req, res) ->
