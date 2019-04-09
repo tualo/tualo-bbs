@@ -285,7 +285,9 @@ class HttpServer extends Command
     app.get '/stopjob', @expressStopJob.bind(@)
     app.get '/restartimprint', @restartImprint.bind(@)
     app.all '/hotswitch', @expressHotSwitch.bind(@)
-    app.all '/returnstate', @expressReturnState.bind(@)
+    app.all '/resultstate', @expressResultState.bind(@)
+    app.all '/startswitch', @expressStartSwitch.bind(@)
+    app.all '/stopswitch', @expressStopSwitch.bind(@)
     app.all '/reboot', @expressReboot.bind(@)
     app.listen @args.port,'0.0.0.0'
 
@@ -368,13 +370,28 @@ class HttpServer extends Command
       me.getStatus(true)
     @controller 'getStopPrintjob',closeFN,doneFN,errorFN
 
+  expressStartSwitch: (req) ->
+    proc = spawn path.resolve( path.join(path.dirname(__filename), '..', '..', 'bin', 'start-switch' ) ), []
+    res.send(JSON.stringify({success: true,msg: '.'}))
 
-  expressReturnState: (req, res) ->
+  expressStopSwitch: (req) ->
+    proc = spawn path.resolve( path.join(path.dirname(__filename), '..', '..', 'bin', 'stop-switch' ) ), []
+    res.send(JSON.stringify({success: true,msg: '.'}))
+
+  expressResultState: (req, res) ->
     me = @
     message = {}
     bodymessage = JSON.parse(req.body.message)
-    me.setReturnState bodymessage.state
-    res.send(JSON.stringify({success: true,msg: message}))
+    me.currentJob ''
+    me.setCustomerFile ''
+    me.setResultState bodymessage.resultstate 
+    # proc = spawn 'stty', ['-F','/dev/ttyUSB0','speed','9600','cs8']
+    # proc1 = spawn 'stty', ['-F','/dev/ttyUSB0','speed','9600','cs8']
+    # proc2 = spawn 'echo', ['-n','/dev/ttyUSB0','speed','9600','cs8']
+    # stty -F /dev/ttyUSB0 speed 9600 cs8
+    # echo -n -e '\xA0\x01\x00\xA1' > /dev/ttyUSB0 # Relay AUS
+    # echo -n -e '\xA0\x01\x01\xA2' > /dev/ttyUSB0 # Relay AN
+    res.send(JSON.stringify({success: true,msg: '.'}))
 
   expressHotSwitch: (req, res) ->
     me = @
@@ -562,10 +579,10 @@ class HttpServer extends Command
           if err
             console.log err
 
-  setReturnState: (state) ->
-    fs.exists '/opt/grab/returnstate.txt',(exists)->
+  setResultState: (state) ->
+    fs.exists '/opt/grab/resultstate.txt',(exists)->
       if exists
-        fs.writeFile '/opt/grab/returnstate.txt', state, (err) ->
+        fs.writeFile '/opt/grab/resultstate.txt', state, (err) ->
           if err
             console.log err
 
