@@ -370,11 +370,11 @@ class HttpServer extends Command
       me.getStatus(true)
     @controller 'getStopPrintjob',closeFN,doneFN,errorFN
 
-  expressStartSwitch: (req) ->
+  expressStartSwitch: (req,res) ->
     proc = spawn path.resolve( path.join(path.dirname(__filename), '..', '..', 'bin', 'start-switch' ) ), []
     res.send(JSON.stringify({success: true,msg: '.'}))
 
-  expressStopSwitch: (req) ->
+  expressStopSwitch: (req,res) ->
     proc = spawn path.resolve( path.join(path.dirname(__filename), '..', '..', 'bin', 'stop-switch' ) ), []
     res.send(JSON.stringify({success: true,msg: '.'}))
 
