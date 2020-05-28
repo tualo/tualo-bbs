@@ -4,6 +4,7 @@ module.exports =
 class MSG2CUGETSTATUS extends Message
 
   constructor: () ->
+    super()
     @b_unkown = 1
     @statusID = 0x191b
     @setMessageInterface Message.INTERFACE_DO

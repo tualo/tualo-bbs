@@ -42,6 +42,7 @@ class Message extends EventEmitter
   @PRINT_ENDORSEMENT_OFF=0
 
   constructor: (options) ->
+    super(options)
     @interface_of_message = 0
     @type_of_message = 0
     @bytes_of_application_data = 0

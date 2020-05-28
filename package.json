@@ -2,26 +2,26 @@
     "name": "tualo-bbs",
     "version": "1.2.004",
     "description": "bbs class collection",
-    "main": "lib\/main.js",
+    "main": "lib/main.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "Thomas Hoffmann",
     "license": "GPL-3.0",
     "devDependencies": {
-        "grunt": "^1.0.1",
-        "grunt-coffeelint": "0.0.16",
-        "grunt-contrib-coffee": "^1.0.0"
+        "grunt": "^1.1.0",
+        "grunt-coffeelint": "*",
+        "grunt-contrib-coffee": "^2.1.0"
     },
     "dependencies": {
-        "colors": "^1.1.2",
-        "express": "^4.16.1",
+        "colors": "^1.4.0",
+        "express": "^4.17.1",
         "freeport": "^1.0.5",
-        "mysql": "^2.11.1",
+        "mysql": "^2.18.1",
         "simple-stats-server": "0.0.5",
-        "socket.io": "^1.4.6",
-        "tualo-commander": "*",
+        "socket.io": "^1.7.4",
+        "tualo-commander": "^1.0.0",
         "tualo-template": "0.0.2",
-        "ws": "^3.0.0"
+        "ws": "^3.3.3"
     }
 }

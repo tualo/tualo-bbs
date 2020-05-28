@@ -6,6 +6,7 @@ module.exports =
 class MSG2CUSTARTPRINTJOB extends Message
 
   constructor: () ->
+    super()
     @bbs_version = process.env.BBS_VERSION || 2
     @bbs_version = parseInt(@bbs_version)
     @job_id = 1

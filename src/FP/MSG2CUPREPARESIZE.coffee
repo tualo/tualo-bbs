@@ -4,6 +4,7 @@ module.exports =
 class MSG2CUPREPARESIZE extends Message
 
   constructor: () ->
+    super()
     @size = 0
 
     @setMessageInterface Message.INTERFACE_UN

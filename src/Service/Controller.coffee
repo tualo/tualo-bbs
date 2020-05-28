@@ -10,6 +10,7 @@ StopPrintjob = require '../Sequence/StopPrintjob'
 module.exports =
 class Controller extends EventEmitter
   constructor: () ->
+    super()
     @timeout = 60000
     @ping_timeout = 45000
     @ip = "127.0.0.1"

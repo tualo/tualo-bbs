@@ -5,6 +5,7 @@ MessageBuffer = require './MessageBuffer'
 module.exports =
 class MSG2CUOPENSERVICE extends Message
   constructor: () ->
+    super()
     @type = 'MSG2CUOPENSERVICE'
     @serviceID = 0
     @errorCode = 0

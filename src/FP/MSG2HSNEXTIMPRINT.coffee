@@ -4,6 +4,7 @@ module.exports =
 class MSG2HSNEXTIMPRINT extends Message
 
   constructor: () ->
+    super()
     @type = 'MSG2HSNEXTIMPRINT'
     @bbs_version = process.env.BBS_VERSION || 2
     @bbs_version = parseInt(@bbs_version)

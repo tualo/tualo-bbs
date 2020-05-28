@@ -4,6 +4,7 @@ module.exports =
 class MSG2CURETURNSTATUSLIGHT extends Message
 
   constructor: () ->
+    super()
     @available_scale = 0
     @available_scale_text = 'unkown'
     @system_uid = 0

@@ -10,6 +10,7 @@ MSG2CUPREPARESIZE = require '../FP/MSG2CUPREPARESIZE'
 module.exports =
 class Sequence extends EventEmitter
   constructor: (socket) ->
+    super()
     @client = socket
     @client.closeEventName = 'expected'
     @client.on 'data', (data) => @onData(data)

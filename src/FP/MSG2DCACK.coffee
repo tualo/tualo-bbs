@@ -3,6 +3,7 @@ Message = require './Message'
 module.exports =
 class MSG2DCACK extends Message
   constructor: () ->
+    super()
     @serviceID = 0
     @setMessageInterface Message.INTERFACE_DI
     @setMessageType Message.TYPE_ACK

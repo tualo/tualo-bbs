@@ -4,6 +4,7 @@ module.exports =
 class MSG2CUGETSTATUSRESPONSE extends Message
 
   constructor: () ->
+    super()
     @b_unkown = 1
     @statusID = 0x191b
     @version = new Buffer 0

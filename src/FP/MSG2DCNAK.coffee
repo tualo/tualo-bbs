@@ -3,6 +3,7 @@ Message = require './Message'
 module.exports =
 class MSG2DCNAK extends Message
   constructor: () ->
+    super()
     @serviceID = 0
     @errorCode = 0
     @info = ""

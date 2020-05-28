@@ -12,6 +12,7 @@ freeport = require 'freeport'
 module.exports =
 class Imprint extends EventEmitter
   constructor: (machine_ip) ->
+    super()
     @machine_ip = machine_ip
     @timeout = 60*60*60000
     @port = 14445
