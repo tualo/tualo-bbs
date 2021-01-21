@@ -19,7 +19,7 @@
         "freeport": "^1.0.5",
         "mysql": "^2.18.1",
         "simple-stats-server": "0.0.5",
-        "socket.io": "^1.7.4",
+        "socket.io": "^2.4.0",
         "tualo-commander": "^1.0.0",
         "tualo-template": "0.0.2",
         "ws": "^3.3.3"
